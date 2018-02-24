@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { setCategories } from './actions/CategoryActions.js'
+import { connect } from 'react-redux'
 
 class App extends Component {
   constructor(props) {
@@ -11,17 +13,30 @@ class App extends Component {
   }
 
   componentDidMount() {
+
+    const { setInitialCategories } = this.props
+
     const url = `${process.env.REACT_APP_BACKEND}/categories`;
     console.log('fetching from url', url);
     fetch(url, { headers: { 'Authorization': 'whatever-you-want' },
                  credentials: 'include' } )
       .then( (res) => { return(res.text()) })
       .then((data) => {
-        this.setState({backend:data});
+      	console.log("data is:")
+      	console.log(data);
+      	console.log(JSON.parse(data));
+      	console.log("Calling setInitialCategories")
+        setInitialCategories(JSON.parse(data));
+      	console.log("Back from  setInitialCategories")
       });
   }
 
   render() {
+    const { categories } = this.props
+    
+    console.log("render---------------------")
+    console.log(this.props)
+    
     return (
       <div className="App">
         <div className="App-header">
@@ -33,11 +48,25 @@ class App extends Component {
         </p>
         <p>
           Talking to the backend yields these categories: <br/>
-          {this.state.backend}
+          *{ categories.map( (c) => (c.name ) ) }*
         </p>
       </div>
     );
   }
 }
 
-export default App;
+function mapStateToProps ( state ) {
+  	const { categories } = state
+  return { categories: categories }
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    setInitialCategories: (data) => dispatch(setCategories(data)),
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App)
