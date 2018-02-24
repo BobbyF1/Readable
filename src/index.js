@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-import categories from './reducers/categories.js'
 import { createStore, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
+import combinedReducers from './reducers/combinedReducers'
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
@@ -19,7 +19,7 @@ const logger = store => next => action => {
 }
 
 const store = createStore(
-  categories,
+  combinedReducers,	//categories
   composeEnhancers(applyMiddleware(logger))
 )
 
