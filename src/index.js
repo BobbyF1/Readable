@@ -18,6 +18,7 @@ const logger = store => next => action => {
   return result
 }
 
+
 const store = createStore(
   combinedReducers,	//categories
   composeEnhancers(applyMiddleware(logger))
