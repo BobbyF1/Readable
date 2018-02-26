@@ -1,17 +1,22 @@
 import React, { Component } from 'react';
 import './App.css';
-import { setCategories } from './actions/CategoryActions.js'
-import { setPosts, setPostCommentsCount } from './actions/PostActions.js'
+import { loadCategories } from './actions/CategoryActions.js'
+import { loadPosts, setPostCommentsCount } from './actions/PostActions.js'
 import { addComments } from './actions/CommentActions.js'
 import { connect } from 'react-redux'
 import Loading from 'react-loading'
- 
+import DropDownSelector from './components/DropDownSelector.js'
+import PostsListView from './components/PostsListView.js'
+
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true
+      loading: true,
+      categoriesFilter: "All"
     }
+    
+    this.selectCategory = this.selectCategory.bind(this)
   }
   
   auth = { headers: { 'Authorization': 'whatever-you-want' }, credentials: 'include' } 
@@ -24,23 +29,20 @@ class App extends Component {
     
   	this.setState(() => ({ loading: true }))
 
-    const { setInitialCategories, setInitialPosts, storeComments } = this.props
+	this.props.loadCategories()
+	this.props.loadPosts()
 
-    const urlCat = `${process.env.REACT_APP_BACKEND}/categories`;
-    fetch(urlCat, this.auth)
-      .then( (res) => { return(res.text()) })
-      .then((data) => { setInitialCategories(JSON.parse(data).categories) })
-      .catch((err) => (console.log("Error retrieving categories: "+ err)));
-
-    const urlPost = `${process.env.REACT_APP_BACKEND}/posts`;
-    fetch(urlPost, this.auth )
-      .then( (res) => { return(res.text()) })
-      .then( (data) => { setInitialPosts(JSON.parse(data)) } )
-	  .then ( (data) => this.setCommentsCount() )
-      .then( () =>  this.setState({loading: false}) ) 
-      .catch((err) => (console.log("Error retrieving posts: "+ err)));
+  	this.setState(() => ({ loading: false }))
       
   }
+
+	 componentWillUpdate(nextProps) {
+       if ( ( nextProps.loadedCategories && nextProps.loadedPosts) && ! (this.props.loadedCategories && this.props.loadedPosts) ) 
+       {
+       		console.log("Loaded Categories AND Posts!!!")
+     	}
+       
+     }
 
 	setCommentsCount(){
       
@@ -59,14 +61,30 @@ class App extends Component {
       	}      
     }
 
+	selectCategory(data){
+      this.setState({categoriesFilter: data})
+    }
+
   render() {
-    const { categories, posts, comments } = this.props
+    const { categories, posts  } = this.props
 
     return (
       <div className="App">
-	      { 
-      		this.state.loading === true ? <Loading delay={5} type='spin' color='#222' className='loading' /> : <p>Loaded!</p> 
-      	  }
+      	<div>
+	      	{ this.state.loading === true ? 
+      			<Loading delay={5} type='spin' color='#222' className='loading' /> 
+      			:
+      			<div>
+      				<h2>Category</h2>
+      				<DropDownSelector 
+      					selectCategory={this.selectCategory} 
+      					displayValues={Array.isArray(categories) ? categories : [] } displayAllItem={true} 
+					/>
+					<hr size={10}/>
+					 <PostsListView posts={posts.length > 0 ? posts.filter( (p) => this.state.categoriesFilter === "All" || p.category === this.state.categoriesFilter ) : [] } />
+      			</div>
+      		}
+      	</div>
       </div>
     );
   }
@@ -75,16 +93,18 @@ class App extends Component {
 function mapStateToProps ( {categories, posts, comments} ) {
   	
   return { 
-    	categories,
-        posts,
-    	comments
+    	categories: categories.data,
+        posts: posts.data,
+    	comments,
+    	loadedCategories: categories.isLoaded,
+    	loadedPosts: posts.isLoaded
   }
 }
 
 function mapDispatchToProps (dispatch) {
   return {
-    setInitialCategories: (data) => dispatch(setCategories(data)),
-    setInitialPosts: (data) => dispatch(setPosts(data)),
+    loadCategories: () => dispatch(loadCategories()),
+    loadPosts: () => dispatch(loadPosts()),
     setCommentsCount: (post, count) => dispatch(setPostCommentsCount(post, count)),
     storeComments: (comments) => dispatch(addComments(comments))
   }
