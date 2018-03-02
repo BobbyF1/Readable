@@ -1,7 +1,9 @@
 import {
   SET_POSTS,
   SET_POST_COMMENTS_COUNT, 
-  SET_POST_ZERO_COMMENTS_COUNT
+  SET_POST_ZERO_COMMENTS_COUNT,
+  UP_VOTE_POST, 
+  DOWN_VOTE_POST
 } from '../actions/PostActions.js'
 
 function posts (state = {data: [], isLoaded: false, postsWithCommentCount: 0 }, action) {
@@ -9,8 +11,9 @@ function posts (state = {data: [], isLoaded: false, postsWithCommentCount: 0 }, 
   var newData
   var newState
   var postsWithCommentCount
-       
+
   switch (action.type) {
+      
     case SET_POSTS:
   		const { posts } = action        
       	return {
@@ -41,6 +44,24 @@ function posts (state = {data: [], isLoaded: false, postsWithCommentCount: 0 }, 
                     setAllCommentCounts: postsWithCommentCount === state.data.length , 
                     postsWithCommentCount: postsWithCommentCount }
       return newState
+      
+    case UP_VOTE_POST:
+      	postId = action.postId
+      	newData = state.data.map( (post) =>  {return post.id === postId ? Object.assign({}, post, { voteScore: post.voteScore + 1 } ) : post } )         
+      	newState = { data: newData, 
+                    isLoaded: state.isLoaded, 
+                    setAllCommentCounts: postsWithCommentCount === state.data.length , 
+                    postsWithCommentCount: postsWithCommentCount }
+      	return newState	
+
+    case DOWN_VOTE_POST:
+      	postId = action.postId
+      	newData = state.data.map( (post) =>  {return post.id === postId ? Object.assign({}, post, { voteScore: post.voteScore - 1 } ) : post } )         
+      	newState = { data: newData, 
+                    isLoaded: state.isLoaded, 
+                    setAllCommentCounts: postsWithCommentCount === state.data.length , 
+                    postsWithCommentCount: postsWithCommentCount }
+      	return newState	
       
     default :
       	return state

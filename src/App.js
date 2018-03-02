@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import { loadCategories } from './actions/CategoryActions.js'
-import { loadPosts, setPostCommentCounts } from './actions/PostActions.js'
+import { loadPosts, setPostCommentCounts, upVotePostAction, downVotePostAction } from './actions/PostActions.js'
 import { addComments } from './actions/CommentActions.js'
 import { connect } from 'react-redux'
 import Loading from 'react-loading'
@@ -18,6 +18,8 @@ class App extends Component {
     
     this.selectCategory = this.selectCategory.bind(this)
     this.commentCounts = this.commentCounts.bind(this)
+    this.upVote = this.upVote.bind(this)
+    this.downVote = this.downVote.bind(this)
   }
   
   auth = { headers: { 'Authorization': 'whatever-you-want' }, credentials: 'include' } 
@@ -51,6 +53,14 @@ class App extends Component {
       this.setState({categoriesFilter: data})
     }
 
+	upVote(post){
+      this.props.upVotePost(post.id)
+    }
+
+	downVote(post){
+      this.props.downVotePost(post.id)
+    }
+
 	commentCounts(){
       console.log("CLIEKCED:")
       console.log(this.props)
@@ -79,8 +89,9 @@ class App extends Component {
 					/>
 					<hr size={10}/>
 					 <PostsListView posts={posts? 
-                                           posts.length > 0 ? posts.filter( (p) => this.state.categoriesFilter === "All" || p.category === this.state.categoriesFilter ) : [] 
-                                          	: [] } />
+                                           posts.length > 0 ? posts.filter( (p) => this.state.categoriesFilter === "All" || p.category === this.state.categoriesFilter ) : [] : [] } 
+					upVote={(postId) => this.upVote(postId)} 
+					downVote={(postId) => this.downVote(postId)}	/>
       			</div>
       		}
       	</div>
@@ -106,7 +117,9 @@ function mapDispatchToProps (dispatch) {
     loadCategories: () => dispatch(loadCategories()),
     loadPosts: () => dispatch(loadPosts()),
     setCommentCounts: (posts) => dispatch(setPostCommentCounts(posts)),
-    storeComments: (comments) => dispatch(addComments(comments))
+    storeComments: (comments) => dispatch(addComments(comments)),
+    upVotePost: (post) => dispatch(upVotePostAction(post)),
+    downVotePost: (post) => dispatch(downVotePostAction(post)),
   }
 }
 

@@ -5,7 +5,17 @@ class PostsListView extends Component {
 
   static propTypes = {
         posts : PropTypes.array.isRequired,
+    	upVote: PropTypes.func.isRequired,
+    	downVote: PropTypes.func.isRequired,
   }
+
+	handleUpvote(e, post){
+      this.props.upVote(post)
+    }
+
+	handleDownvote(e, post){
+      this.props.downVote(post)
+    }
 
 	render(){
       
@@ -21,8 +31,8 @@ class PostsListView extends Component {
         		<strong> Comments: </strong>{post.commentCount ? post.commentCount : 0 }
         		<strong> Current score is </strong>{post.voteScore}
         		<br/>
-        		<button>UpVote Post</button>
-        		<button>DownVote Post</button>
+        		<button onClick={ (e) => this.handleUpvote(e, post) }>UpVote Post</button>
+        		<button onClick={ (e) => this.handleDownvote(e, post) }>DownVote Post</button>
         		<button>Edit Post</button>
         		<button>Delete Post</button>
         		<hr/>        		
