@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import Loading from 'react-loading'
 import DropDownSelector from './components/DropDownSelector.js'
 import PostsListView from './components/PostsListView.js'
+import { Button } from 'reactstrap';
 
 class App extends Component {
   constructor(props) {
@@ -80,9 +81,7 @@ class App extends Component {
       			:
       			<div>
       				<h2>Category</h2>
-<button onClick={this.commentCounts}>
-  TEST
-</button>
+                    <Button color="danger" onClick={this.commentCounts}>TEST</Button>
       				<DropDownSelector 
       					selectCategory={this.selectCategory} 
       					displayValues={Array.isArray(categories) ? categories : [] } displayAllItem={true} 
