@@ -1,8 +1,6 @@
-
 export const
 	SET_CATEGORIES = 'SET_CATEGORIES',
 	LOAD_CATEGORIES = 'LOAD_CATEGORIES'
-
 
 export function setCategories ( categories ) {
   return {
@@ -22,6 +20,4 @@ export function loadCategories() {
         .then( (data) => { dispatch(setCategories(JSON.parse(data).categories)) })
         .catch((err) => (console.log("Error retrieving categories: "+ err)));
     }
-    
-
 }

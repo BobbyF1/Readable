@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
@@ -7,7 +8,7 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
 import combinedReducers from './reducers/combinedReducers'
 import thunk from 'redux-thunk';
-import 'bootstrap/dist/css/bootstrap.css';
+import { BrowserRouter }  from 'react-router-dom'
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
@@ -28,7 +29,9 @@ const store = createStore(
 
 ReactDOM.render(
   <Provider store={store}>
-  	<App />
+  	<BrowserRouter>
+  		<App />
+  	</BrowserRouter>
   </Provider>
   , document.getElementById('root'));
 registerServiceWorker();

@@ -1,6 +1,5 @@
 import { addComments } from './CommentActions.js'
-
-//name: persist or _ for internal or ...Action
+import { finishedLoadingData } from './GenericActions.js'
 
 export const 
 	SET_POSTS = 'SET_POSTS',
@@ -9,7 +8,6 @@ export const
 	SET_POST_ZERO_COMMENTS_COUNT = 'SET_POST_ZERO_COMMENTS_COUNT',
 	UP_VOTE_POST = 'UP_VOTE_POST',
 	DOWN_VOTE_POST = 'DOWN_VOTE_POST'
-
 
 export function downVote (postId) {
   return {
@@ -47,7 +45,6 @@ export function setZeroCommentsCount ( post ) {
   
 }
 
-
 export function downVotePostAction(postId){ 
   const urlPost = `${process.env.REACT_APP_BACKEND}/posts/${postId}`
   return (dispatch) => {
@@ -64,7 +61,6 @@ export function downVotePostAction(postId){
 }
 
 export function upVotePostAction(postId){ 
-
   const urlPost = `${process.env.REACT_APP_BACKEND}/posts/${postId}`
   return (dispatch) => {
   	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'
@@ -79,23 +75,22 @@ export function upVotePostAction(postId){
   } 
 }
 
-
 export function loadPosts() {
 
   const urlPost = `${process.env.REACT_APP_BACKEND}/posts`;
-  return (dispatch) =>
+  return (dispatch, getState) =>
   {  
   	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' }, credentials: 'include' } )
       .then( (res) => { return(res.text()) })
       .then ( (data) => {  return JSON.parse(data) } )
       .then( (data) => { dispatch(setPosts(data)) ; return (data) } )
+      .then(  () => { getState().posts.isLoaded ? dispatch(setPostCommentCounts(getState().posts.data)) : null } ) 
       .catch( (err) => (console.log("Error retrieving posts in loadPosts: "+ err)));
   }
 }
 
 export function setPostCommentCounts(posts){
-  
-  	return(dispatch) =>
+  	return(dispatch, getState) =>
     {
       if(posts){
         posts.forEach( function(post) {
@@ -113,6 +108,7 @@ export function setPostCommentCounts(posts){
                                      }
                                     
                                     } ) 
+            .then( () => {getState().posts.setAllCommentCounts ? dispatch(finishedLoadingData()) : null } )
             .catch((err) => (console.log("Error retrieving comment counts: "+ err)));
           })
       	}
