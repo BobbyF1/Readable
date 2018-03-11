@@ -3,10 +3,18 @@ import {
   SET_POST_COMMENTS_COUNT, 
   SET_POST_ZERO_COMMENTS_COUNT,
   UP_VOTE_POST, 
-  DOWN_VOTE_POST
+  DOWN_VOTE_POST,
+  EDIT_POST,
+
 } from '../actions/PostActions.js'
 
-function posts (state = {data: [], isLoaded: false, postsWithCommentCount: 0 }, action) {
+function posts (state = {
+  						 data: [], 
+                         isLoaded: false,
+                         postsWithCommentCount: 0 ,
+                         isEditingPost: false ,
+  						 isNewPost: false
+                        }, action) {
   
   var newData
   var newState
@@ -20,7 +28,10 @@ function posts (state = {data: [], isLoaded: false, postsWithCommentCount: 0 }, 
           data: posts,
           isLoaded: true, 
           setAllCommentCounts: false,
-          postsWithCommentCount: 0
+          postsWithCommentCount: 0,
+          isEditingPost: false,
+          isNewPost: false,
+          
 }
 
     case SET_POST_COMMENTS_COUNT:
@@ -31,7 +42,10 @@ function posts (state = {data: [], isLoaded: false, postsWithCommentCount: 0 }, 
       	newState = { data: newData, 
                     isLoaded: state.isLoaded, 
                     setAllCommentCounts: postsWithCommentCount === state.data.length , 
-                    postsWithCommentCount: postsWithCommentCount }
+                    postsWithCommentCount: postsWithCommentCount,
+                    isEditingPost: state.isEditingPost,
+                    isNewPost: state.isNewPost,
+                   }
       return newState
       
     case SET_POST_ZERO_COMMENTS_COUNT:
@@ -42,7 +56,10 @@ function posts (state = {data: [], isLoaded: false, postsWithCommentCount: 0 }, 
       	newState = { data: newData, 
                     isLoaded: state.isLoaded, 
                     setAllCommentCounts: postsWithCommentCount === state.data.length , 
-                    postsWithCommentCount: postsWithCommentCount }
+                    postsWithCommentCount: postsWithCommentCount,
+                    isEditingPost: state.isEditingPost,
+                    isNewPost: state.isNewPost,
+                   }
       return newState
       
     case UP_VOTE_POST:
@@ -51,8 +68,11 @@ function posts (state = {data: [], isLoaded: false, postsWithCommentCount: 0 }, 
       	newState = { data: newData, 
                     isLoaded: state.isLoaded, 
                     setAllCommentCounts: postsWithCommentCount === state.data.length , 
-                    postsWithCommentCount: postsWithCommentCount }
-      	return newState	
+                    postsWithCommentCount: postsWithCommentCount ,
+                    isEditingPost: state.isEditingPost,
+                    isNewPost: state.isNewPost,
+                   }
+      return newState	
 
     case DOWN_VOTE_POST:
       	postId = action.postId
@@ -60,7 +80,21 @@ function posts (state = {data: [], isLoaded: false, postsWithCommentCount: 0 }, 
       	newState = { data: newData, 
                     isLoaded: state.isLoaded, 
                     setAllCommentCounts: postsWithCommentCount === state.data.length , 
-                    postsWithCommentCount: postsWithCommentCount }
+                    postsWithCommentCount: postsWithCommentCount,
+                    isEditingPost: state.isEditingPost,
+                    isNewPost: state.isNewPost,
+                   }
+      	return newState	
+
+      
+    case EDIT_POST:
+      	newState = { data: newData, 
+                    isLoaded: state.isLoaded, 
+                    setAllCommentCounts: postsWithCommentCount === state.data.length , 
+                    postsWithCommentCount: postsWithCommentCount,
+                    isEditingPost: true,
+                    isNewPost: false,
+                   }
       	return newState	
       
     default :

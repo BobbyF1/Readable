@@ -7,7 +7,15 @@ export const
 	LOAD_POSTS = 'LOAD_POSTS',
 	SET_POST_ZERO_COMMENTS_COUNT = 'SET_POST_ZERO_COMMENTS_COUNT',
 	UP_VOTE_POST = 'UP_VOTE_POST',
-	DOWN_VOTE_POST = 'DOWN_VOTE_POST'
+	DOWN_VOTE_POST = 'DOWN_VOTE_POST',
+	EDIT_POST = 'EDIT_POST'
+
+export function editPost(post){
+  return {
+    type: EDIT_POST,
+    post
+  }
+}
 
 export function downVote (postId) {
   return {
@@ -84,7 +92,7 @@ export function loadPosts() {
       .then( (res) => { return(res.text()) })
       .then ( (data) => {  return JSON.parse(data) } )
       .then( (data) => { dispatch(setPosts(data)) ; return (data) } )
-      .then(  () => { getState().posts.isLoaded ? dispatch(setPostCommentCounts(getState().posts.data)) : null } ) 
+      .then(  () => {if( getState().posts.isLoaded )  dispatch(setPostCommentCounts(getState().posts.data)) } ) 
       .catch( (err) => (console.log("Error retrieving posts in loadPosts: "+ err)));
   }
 }
@@ -108,7 +116,7 @@ export function setPostCommentCounts(posts){
                                      }
                                     
                                     } ) 
-            .then( () => {getState().posts.setAllCommentCounts ? dispatch(finishedLoadingData()) : null } )
+            .then( () => { if (getState().posts.setAllCommentCounts) dispatch(finishedLoadingData()) } )
             .catch((err) => (console.log("Error retrieving comment counts: "+ err)));
           })
       	}

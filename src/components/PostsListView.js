@@ -12,6 +12,7 @@ class PostsListView extends Component {
         posts : PropTypes.array.isRequired,
     	upVote: PropTypes.func.isRequired,
     	downVote: PropTypes.func.isRequired,
+    	editPost: PropTypes.func.isRequired,
   }
 
 	handleUpvote(e, post){
@@ -20,6 +21,10 @@ class PostsListView extends Component {
 
 	handleDownvote(e, post){
       this.props.downVote(post)
+    }
+
+	handleEditPost(e, post){
+      this.props.editPost(post)
     }
 
 	render(){
@@ -40,7 +45,7 @@ class PostsListView extends Component {
                 <div className="bg-info clearfix" style={{ padding: '.4rem', "marginLeft": "10px", "marginRight": "10px", "borderRadius": "25px" }}>
                     <Button className="btn btn-secondary float-left" style={{"marginLeft": "10px"}} size="sm" color="success" onClick={ (e) => this.handleUpvote(e, post) }><FaThumpbsUp /> UpVote Post</Button>{' '}
                     <Button className="btn btn-secondary float-left" style={{margin: "0px 10px"}} size="sm" color="danger" onClick={ (e) => this.handleDownvote(e, post) }><FaThumpbsDown /> DownVote Post</Button>{' '}
-                    <Button className="btn btn-primary float-right" style={{margin: "0px 10px"}} size="sm" color="primary"><FaEdit /> Edit Post</Button>{' '}
+                    <Button className="btn btn-primary float-right" style={{margin: "0px 10px"}} size="sm" color="primary" onClick={ (e) => this.handleEditPost(e, post) }><FaEdit /> Edit Post</Button>{' '}
                     <Button className="btn btn-secondary float-right" style={{margin: "0px 10px"}} size="sm" color="secondary"><FaTimesCircle /> Delete Post</Button>{' '}
 				</div>
         		<hr style={{"border": "solid"}}/>        		
