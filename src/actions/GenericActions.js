@@ -7,6 +7,7 @@ export const
 	NAVIGATION_ERROR = 'NAVIGATION_ERROR'
 
 export function setNavigationError(){
+  console.log("setNavigationError")
   	return(dispatch) => {
       dispatch(navigationError());
     }

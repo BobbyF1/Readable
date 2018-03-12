@@ -9,7 +9,7 @@ import Error from './components/Error.js'
 class App extends Component {
 
   render() {
-
+    
     return (
   		<BrowserRouter>
               <div>
@@ -17,13 +17,13 @@ class App extends Component {
                  	<h1>Edit</h1>
                  )}
 
-      			{!this.props.isEditingPost && !this.props.isEditingPost && (    
+      			{!this.props.isEditingPost && (    
                     <div className="App">
       					<Switch>
+                          <Route exact path="/" component={ListViewContainer} />
                           <Route path="/posts/create"  render={(props) => <EditPost {...props} mode={"create"}/> } />
                           <Route exact path="/error" component={Error} />
                           <Route path="/:cat" component={ListViewContainer} />
-                          <Route exact path="/" component={ListViewContainer} />
       					</Switch>
                     </div>
       			)}
