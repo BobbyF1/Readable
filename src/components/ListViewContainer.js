@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { upVotePostAction, downVotePostAction, editPost } from '../actions/PostActions.js'
+import { setCurrentCategory } from '../actions/CategoryActions.js'
 import { connect } from 'react-redux'
 import Loading from 'react-loading'
 import PostsListView from '../components/PostsListView.js'
@@ -25,7 +26,11 @@ class ListViewContainer extends Component
   	}
   
   	componentWillReceiveProps(nextProps){
-    	if(nextProps.categories.length > 0 ) {
+      
+     if (this.props.isLoaded) 
+     	this.props.setCurrentCategory(nextProps.match.params.cat ? nextProps.match.params.cat : "" )
+
+      if(nextProps.categories) {
           	if (nextProps.match.params.cat)
               	this.validateCategory(nextProps.match.params.cat)
         }
@@ -57,10 +62,8 @@ class ListViewContainer extends Component
       this.props.editPost(post)
     }
 
-    render(){
-      
+    render(){    
       	const selectedCategory = this.props.match.params.cat ? this.props.match.params.cat : ""
-      
 		return (  
       		<div>
 				<div>
@@ -91,11 +94,12 @@ class ListViewContainer extends Component
   	}
   }
 
-function mapStateToProps ( {categories, posts, comments, generic} ) {
+function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
   return { 
     	categories: categories.data,
         posts: posts.data,
-    	isLoaded: generic.loaded
+    	isLoaded: generic.loaded,
+    	currentCategory: categories.currentCategory
   }
 }
 
@@ -105,12 +109,10 @@ function mapDispatchToProps (dispatch) {
     downVotePost: (post) => dispatch(downVotePostAction(post)),
     triggerInitialDataLoad: () => dispatch( initialDataLoad()),
     editPost: (post) => dispatch(editPost(post)),
-    setNavigationError: () => dispatch(setNavigationError())
+    setNavigationError: () => dispatch(setNavigationError()),
+    setCurrentCategory: (currentCategory) => dispatch(setCurrentCategory(currentCategory))
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ListViewContainer)
+export default connect( mapStateToProps, mapDispatchToProps )(ListViewContainer)
 

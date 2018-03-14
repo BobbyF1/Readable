@@ -1,6 +1,17 @@
 export const
 	SET_CATEGORIES = 'SET_CATEGORIES',
-	LOAD_CATEGORIES = 'LOAD_CATEGORIES'
+	LOAD_CATEGORIES = 'LOAD_CATEGORIES',
+	SET_CURRENT_CATEGORY = 'SET_CURRENT_CATEGORY'
+
+export function setCurrentCategory(currentCategory){
+  
+  console.log("setCurrentCategory")
+  
+  return {
+      type: SET_CURRENT_CATEGORY,
+      currentCategory,
+	}
+}
 
 export function setCategories ( categories ) {
   return {

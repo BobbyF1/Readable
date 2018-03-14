@@ -21,8 +21,9 @@ class App extends Component {
                     <div className="App">
       					<Switch>
                           <Route exact path="/" component={ListViewContainer} />
-                          <Route path="/posts/create"  render={(props) => <EditPost {...props} mode={"create"}/> } />
                           <Route exact path="/error" component={Error} />
+                          <Route exact path="/posts/create"  render={(props) => <EditPost {...props} mode={"create"}/> } />
+                          <Route path="/:cat/:postId" render={(props) => <EditPost {...props} mode={"edit"}/> }  />
                           <Route path="/:cat" component={ListViewContainer} />
       					</Switch>
                     </div>
@@ -33,7 +34,7 @@ class App extends Component {
   }
 }
 
-function mapStateToProps ( {categories, posts, comments, generic} ) {
+function mapStateToProps ( {categories, posts, comments, generic}, ownProps) {
   return { 
     	isEditingPost: posts.isEditingPost,
   }

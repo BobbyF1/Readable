@@ -47,8 +47,7 @@ class PostsListView extends Component {
         const toPost = this.state.navigateToPost
         const navigateToUrl = "/" + toPost.category + "/" + toPost.id
         if (currentPathname !== navigateToUrl) 
-          return <Redirect to = { navigateToUrl } push={true} /> 
-				
+          return <Redirect to = { navigateToUrl } push={true} /> 				
       }
       
       return (
