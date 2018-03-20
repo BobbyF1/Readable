@@ -5,7 +5,8 @@ import {
   UP_VOTE_POST, 
   DOWN_VOTE_POST,
   EDIT_POST,
-
+  ADD_POST,
+  DELETED_POST
 } from '../actions/PostActions.js'
 
 function posts (state = {
@@ -96,6 +97,29 @@ function posts (state = {
                     isNewPost: false,
                    }
       	return newState	
+
+    case ADD_POST:
+      	newState = { 
+                    data: [...state.data, action.post],
+                    isLoaded: state.isLoaded, 
+                    setAllCommentCounts: postsWithCommentCount === state.data.length , 
+                    postsWithCommentCount: postsWithCommentCount,
+                    isEditingPost: false,
+                    isNewPost: false,
+                   }
+      	return newState	
+
+    case DELETED_POST:
+      	newState = { 
+                    data: state.data.filter( (p) => p.id!==action.postId ),
+                    isLoaded: state.isLoaded, 
+                    setAllCommentCounts: postsWithCommentCount === state.data.length , 
+                    postsWithCommentCount: postsWithCommentCount,
+                    isEditingPost: false,
+                    isNewPost: false,
+                   }
+      	return newState	
+      
       
     default :
       	return state

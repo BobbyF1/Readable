@@ -22,7 +22,8 @@ class ListViewContainer extends Component
   }
 
     componentDidMount() {      
-      	this.props.triggerInitialDataLoad();
+      	if(!(this.props.isLoaded))
+          this.props.triggerInitialDataLoad();
   	}
   
   	componentWillReceiveProps(nextProps){

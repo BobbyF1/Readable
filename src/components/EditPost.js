@@ -6,8 +6,9 @@ import FaEdit from 'react-icons/lib/fa/edit';
 import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import { connect } from 'react-redux'
 import Modal from 'react-modal'
-
-//this.props.mode
+import moment from 'moment'
+import { Link } from 'react-router-dom'
+import { createPost } from '../actions/PostActions.js'
 
 const customStyles={
   content : {
@@ -32,6 +33,8 @@ class EditPost extends Component{
       this.handleChange = this.handleChange.bind(this)
       this.handleOK = this.handleOK.bind(this)
       this.requestModalClose = this.requestModalClose.bind(this)
+      this.handleUpvote = this.handleUpvote.bind(this)
+      this.handleDownvote = this.handleDownvote.bind(this)
       
     }
   
@@ -39,45 +42,52 @@ class EditPost extends Component{
       Modal.setAppElement('body');
     }
 
-  componentDidMount(){
-    
-    console.log("componentDidMount " + this.props.currentCategory)
-    
+	handleUpvote(){
+      console.log("up current state!")
+      console.log(this.state)
+      this.setState({ post: {...this.state.post, voteScore: this.state.post.voteScore + 1 } } );
+    }
+
+	handleDownvote(){
+      this.setState({ post: {...this.state.post, voteScore: this.state.post.voteScore - 1 } } );
+    }
+
+  componentDidMount(){    
     if(this.props.mode==="edit"){
     	const postId = this.props.match.params.postId
      	this.setState( { post:  this.props.posts.find( function(p) { return ( p.id ===  postId  ) } ) } )
 	}
 	else{
-      	var dateNow = Date.now()
-      	var newId = dateNow.toString()
-		this.setState( { post: { id: newId,
-                              	timestamp: dateNow,
-                              	title: "New Post",
-                              	body: "New Post Body",
-                              	author: "Author",
-                              	category: this.props.currentCategory,
-                              	voteScore: 0,
-                              	deleted: false
-                             } } )
+      	const dateNow = Date.now()
+      	const newId = dateNow.toString()
+    	this.setState( { post: { 
+                                  id: newId,
+                                  timestamp: dateNow,
+                                  title: "New Post",
+                                  body: "New Post Body",
+                                  author: "Author",
+                                  category: ( this.props.currentCategory!=="" ? this.props.currentCategory :
+                                      this.props.categories.length>0 ? this.props.categories[0].name : "" ),
+                                  voteScore: 0,
+                                  commentCount: 0,
+                                  deleted: false
+                             } 
+					} )
 	}
   }
 
 	requestModalClose(){
-      	console.log("RequestModalClose")
         this.setState( { validationErrorMessage: ""} )      
     }
 
 	handleOK(){
       if(this.state.post.title === "" || this.state.post.body === "" || this.state.post.category === "" || this.state.post.author === ""){
-        console.log("Validation error")
         this.setState( { validationErrorMessage: "A post must have a Category, Title, Body and Author."} )
       }
       else
       {
-      	console.log("Save!")
-
+      	this.props.createPost(this.state.post)
     	}
-      
     }
 
   handleChange(e) {
@@ -87,12 +97,10 @@ class EditPost extends Component{
   }
 
 	render(){
-      
-      console.log(this.state.validationErrorMessage)
-
       return(
       <div className="border" style={{width: "80%", margin: "50px 50px 20px", padding: "20px 20px 50px"}} >
-      	<h1>{this.props.mode.toUpperCase()} POST</h1>
+        <Link to="/" className='close-create-contact'>Close</Link>
+		<h1>{this.props.mode.toUpperCase()} POST</h1>
         <Form>
           <FormGroup row>
               <Label for="Title" sm={2} style={{textAlign: "left"}}>Category</Label>
@@ -133,24 +141,31 @@ class EditPost extends Component{
           <FormGroup row>
               <Label for="CurrentScore" sm={2} style={{textAlign: "left"}}>Current Score</Label>
               <Col sm={5}>      
-                  <Input disabled type="text" name="CurrentScore" id="CurrentScore" 
-      						placeholder={this.props.mode==="edit" ? this.state.post.voteScore : "0" } />      			
+                  <Input disabled type="text" name="CurrentScore" id="CurrentScore" value={ this.state.post.voteScore } />      			
               </Col>
              <Button className="btn float-right" style={{"marginLeft": "10px"}} size="sm" 
 	             color={this.props.mode==="edit"? "success": "disabled"} 							
-    	         onClick={ (e) => this.handleUpvote() } disabled={!(this.props.mode==="edit")} ><FaThumpbsUp /> UpVote Post</Button>{' '}
+    	         onClick={this.handleUpvote} disabled={!(this.props.mode==="edit")} ><FaThumpbsUp /> UpVote Post</Button>{' '}
       		<Button className="btn float-right" style={{margin: "0px 10px"}} size="sm" 
                 color={this.props.mode==="edit"? "danger": "disabled"} onClick={ (e) => this.handleDownvote() } 
                 disabled={!(this.props.mode==="edit")}> <FaThumpbsDown /> DownVote Post</Button>{' '}      
       	</FormGroup>      
-      	<Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="success" onClick={ (e) => this.handleOK() }><FaEdit /> >OK</Button>
-		<Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="danger">Delete Post</Button> 
-      	</Form>
+          <FormGroup row>
+              <Label for="timestamp" sm={2} style={{textAlign: "left"}}>Created</Label>
+              <Col sm={5}>
+                  <Input disabled type="text" name="timestamp" id="timestamp" placeholder={moment(this.state.post.timestamp).format('MMMM Do YYYY, h:mm:ss a')} />
+              </Col>
+          </FormGroup>
+      	<Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="success" onClick={ (e) => this.handleOK() }><FaEdit /> {(this.props.mode==="edit" ? "Save" : "Create" )}</Button>
+		{this.props.mode==="edit" ?
+         	<Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="danger"><FaTimesCircle />Delete Post</Button> 
+      	: null }
+		</Form>
 
 
         <Modal
           overlayClassName='overlay'
-          isOpen={this.state.validationErrorMessage!==""}
+          isOpen={(this.state.validationErrorMessage!=="")}
           onRequestClose={this.requestModalClose}
           contentLabel='Modal'
 		  style={customStyles}
@@ -177,7 +192,7 @@ function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
 
 function mapDispatchToProps (dispatch) {
   return {
-
+	createPost: (post) => dispatch(createPost(post))
   }
 }
 
