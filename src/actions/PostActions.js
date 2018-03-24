@@ -10,7 +10,15 @@ export const
 	DOWN_VOTE_POST = 'DOWN_VOTE_POST',
 	EDIT_POST = 'EDIT_POST', 
 	ADD_POST = 'ADD_POST',
-	DELETED_POST = 'DELETED_POST'
+	DELETED_POST = 'DELETED_POST',
+	EDITED_POST = 'EDITED_POST'
+
+export function editedPost(post){
+  	return{
+      type: EDITED_POST,
+      post: post
+    }  
+}
 
 export function deletedPost(postId){
   	return{
@@ -19,10 +27,10 @@ export function deletedPost(postId){
     }
 }
 
-export function editPost(post){
+export function editPost(){
   return {
     type: EDIT_POST,
-    post
+    test: 1
   }
 }
 
@@ -167,7 +175,6 @@ export function createPost(post){
 
 export function deletePost(post){
     const urlPost = `${process.env.REACT_APP_BACKEND}/posts/${post.id}`;  
-    console.log(urlPost)
   	return (dispatch, getState) => {
     	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
                   }, credentials: 'include' , method: 'delete'
@@ -176,5 +183,23 @@ export function deletePost(post){
       	.then( data => { dispatch(deletedPost(post.id) ) } )
    		.catch( err => console.log('error', err))
     }
- 
+}
+
+export function saveEditPost(post){
+    const urlPost = `${process.env.REACT_APP_BACKEND}/posts/${post.id}`;  
+   	let postBody = JSON.stringify({
+   		title: post.title,
+   		body: post.body,
+      	author: post.author,
+      	voteScore: post.voteScore
+ 	})  	
+    return (dispatch, getState) => {
+    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
+                  }, credentials: 'include' , method: 'put' , body: postBody
+                       })      	
+   		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
+      	.then( data => { dispatch(editedPost(post.id) ) } )
+   		.catch( err => console.log('error', err))
+    } 
+  
 }

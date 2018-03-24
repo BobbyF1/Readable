@@ -8,7 +8,8 @@ import { connect } from 'react-redux'
 import Modal from 'react-modal'
 import moment from 'moment'
 import { Link } from 'react-router-dom'
-import { createPost } from '../actions/PostActions.js'
+import { createPost, saveEditPost } from '../actions/PostActions.js'
+import { editPost } from '../actions/PostActions.js'
 
 const customStyles={
   content : {
@@ -42,9 +43,11 @@ class EditPost extends Component{
       Modal.setAppElement('body');
     }
 
+	componentWillUnmount() {
+      console.log("Goodbye from EDITPOST")
+    }
+
 	handleUpvote(){
-      console.log("up current state!")
-      console.log(this.state)
       this.setState({ post: {...this.state.post, voteScore: this.state.post.voteScore + 1 } } );
     }
 
@@ -53,9 +56,16 @@ class EditPost extends Component{
     }
 
   componentDidMount(){    
+    
+    console.log("consoledidmout")
+    console.log(this.props.mode)
     if(this.props.mode==="edit"){
     	const postId = this.props.match.params.postId
-     	this.setState( { post:  this.props.posts.find( function(p) { return ( p.id ===  postId  ) } ) } )
+        const editPost = this.props.posts.find( function(p) { return ( p.id ===  postId  ) } )
+    	console.log(editPost)
+      	this.props.editPost(  )
+     	this.setState( { post:  editPost  } )
+
 	}
 	else{
       	const dateNow = Date.now()
@@ -86,7 +96,10 @@ class EditPost extends Component{
       }
       else
       {
-      	this.props.createPost(this.state.post)
+		if(this.props.mode==="edit")
+      		this.props.saveEditPost(this.state.post)
+      	else
+      		this.props.createPost(this.state.post)
     	}
     }
 
@@ -97,8 +110,14 @@ class EditPost extends Component{
   }
 
 	render(){
+      
+      console.log("Rendering EditPost")
+      console.log(this.state)
+      
       return(
       <div className="border" style={{width: "80%", margin: "50px 50px 20px", padding: "20px 20px 50px"}} >
+<h1>TEST</h1>
+		<Button onClick={this.test}>Test</Button>
         <Link to="/" className='close-create-contact'>Close</Link>
 		<h1>{this.props.mode.toUpperCase()} POST</h1>
         <Form>
@@ -143,12 +162,7 @@ class EditPost extends Component{
               <Col sm={5}>      
                   <Input disabled type="text" name="CurrentScore" id="CurrentScore" value={ this.state.post.voteScore } />      			
               </Col>
-             <Button className="btn float-right" style={{"marginLeft": "10px"}} size="sm" 
-	             color={this.props.mode==="edit"? "success": "disabled"} 							
-    	         onClick={this.handleUpvote} disabled={!(this.props.mode==="edit")} ><FaThumpbsUp /> UpVote Post</Button>{' '}
-      		<Button className="btn float-right" style={{margin: "0px 10px"}} size="sm" 
-                color={this.props.mode==="edit"? "danger": "disabled"} onClick={ (e) => this.handleDownvote() } 
-                disabled={!(this.props.mode==="edit")}> <FaThumpbsDown /> DownVote Post</Button>{' '}      
+   
       	</FormGroup>      
           <FormGroup row>
               <Label for="timestamp" sm={2} style={{textAlign: "left"}}>Created</Label>
@@ -192,7 +206,9 @@ function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
 
 function mapDispatchToProps (dispatch) {
   return {
-	createPost: (post) => dispatch(createPost(post))
+	createPost: (post) => dispatch(createPost(post)),
+    saveEditPost: (post) => dispatch(saveEditPost(post)),
+    editPost: () => dispatch(editPost()),
   }
 }
 

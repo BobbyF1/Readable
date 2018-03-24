@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { upVotePostAction, downVotePostAction, editPost } from '../actions/PostActions.js'
+import { upVotePostAction, downVotePostAction } from '../actions/PostActions.js'
 import { setCurrentCategory } from '../actions/CategoryActions.js'
 import { connect } from 'react-redux'
 import Loading from 'react-loading'
@@ -72,13 +72,6 @@ class ListViewContainer extends Component
                             <Loading delay={5} type='spin' color='#222' className='loading' /> 
                     :      
                 <div>
-       				<div>
-						<HeaderBar 
-          						categoryFilter={selectedCategory}
-          						categories={this.props.categories ? this.props.categories : {} }
-          						newPost={() => this.newPost()}
-          				/>       
-					</div>
 					<div>
                   		<PostsListView posts={this.props.posts? this.props.posts.length > 0 ? 
                             this.props.posts.filter( (p) => selectedCategory === "" || p.category === selectedCategory ) : [] : [] } 
@@ -109,7 +102,6 @@ function mapDispatchToProps (dispatch) {
     upVotePost: (post) => dispatch(upVotePostAction(post)),
     downVotePost: (post) => dispatch(downVotePostAction(post)),
     triggerInitialDataLoad: () => dispatch( initialDataLoad()),
-    editPost: (post) => dispatch(editPost(post)),
     setNavigationError: () => dispatch(setNavigationError()),
     setCurrentCategory: (currentCategory) => dispatch(setCurrentCategory(currentCategory))
   }

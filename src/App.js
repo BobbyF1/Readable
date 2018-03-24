@@ -5,17 +5,23 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import ListViewContainer from './components/ListViewContainer.js'
 import EditPost from './components/EditPost.js'
 import Error from './components/Error.js'
+import HeaderBar from './components/HeaderBar.js'
 
 class App extends Component {
 
   render() {
-    
+
     return (
   		<BrowserRouter>
               <div>
-      			{this.props.isEditingPost && (
-                 	<h1>Edit</h1>
-                 )}
+
+	          <div>
+    		      <HeaderBar 
+          			categoryFilter={this.props.selectedCategory}
+                    categories={this.props.categories ? this.props.categories : {} }
+                    newPost={() => this.newPost()}
+                />       
+              </div>
 
       			{!this.props.isEditingPost && (    
                     <div className="App">
@@ -37,6 +43,8 @@ class App extends Component {
 function mapStateToProps ( {categories, posts, comments, generic}, ownProps) {
   return { 
     	isEditingPost: posts.isEditingPost,
+    	selectedCategory: categories.currentCategory,
+    	categories: categories.data
   }
 }
 export default connect(

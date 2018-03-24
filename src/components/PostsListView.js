@@ -7,7 +7,7 @@ import FaEdit from 'react-icons/lib/fa/edit';
 import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import { Redirect } from 'react-router-dom'
 import moment from 'moment'
-import { deletePost } from '../actions/PostActions.js'
+import { deletePost, editPost } from '../actions/PostActions.js'
 import { connect } from 'react-redux' 
 
 class PostsListView extends Component {
@@ -31,10 +31,6 @@ class PostsListView extends Component {
       this.props.downVote(post)
     }
 
-	handleEditPost(e, post){
-      this.props.editPost(post)
-    }
-
 	componentDidUpdate(){
       if (this.state.navigateToPost)
         this.setState({ navigateToPost : null })
@@ -49,8 +45,9 @@ class PostsListView extends Component {
       if (this.state.navigateToPost) {
         const toPost = this.state.navigateToPost
         const navigateToUrl = "/" + toPost.category + "/" + toPost.id
-        if (currentPathname !== navigateToUrl) 
-          return <Redirect to = { navigateToUrl } push={true} /> 				
+        if (currentPathname !== navigateToUrl) {
+          return <Redirect to = { navigateToUrl } push={true} /> 		
+		}
       }
       
       return (
@@ -89,7 +86,8 @@ function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    deletePost: (post) => dispatch(deletePost(post))
+    deletePost: (post) => dispatch(deletePost(post)),
+    editPost: (post) => dispatch(editPost(post)),
   }
 }
 
