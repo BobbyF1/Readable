@@ -8,10 +8,20 @@ export const
 	SET_POST_ZERO_COMMENTS_COUNT = 'SET_POST_ZERO_COMMENTS_COUNT',
 	UP_VOTE_POST = 'UP_VOTE_POST',
 	DOWN_VOTE_POST = 'DOWN_VOTE_POST',
-	EDIT_POST = 'EDIT_POST', 
+	SET_EDIT_POST = 'SET_EDIT_POST', 
+	SET_NEW_POST = 'SET_NEW_POST', 
 	ADD_POST = 'ADD_POST',
 	DELETED_POST = 'DELETED_POST',
-	EDITED_POST = 'EDITED_POST'
+	EDITED_POST = 'EDITED_POST',
+	SET_SORT_ORDER = 'SET_SORT_ORDER'
+
+
+export function setSortOrder(sortBy){
+  return{
+    type: SET_SORT_ORDER,
+    sortBy
+  }
+}
 
 export function editedPost(post){
   	return{
@@ -27,10 +37,17 @@ export function deletedPost(postId){
     }
 }
 
-export function editPost(){
+export function setEditPost(editFlag){
   return {
-    type: EDIT_POST,
-    test: 1
+    type: SET_EDIT_POST,
+    edit: editFlag
+  }
+}
+
+export function setNewPost(newFlag){
+  return {
+    type: SET_NEW_POST,
+    new: newFlag
   }
 }
 

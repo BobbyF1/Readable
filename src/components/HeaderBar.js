@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import CategorySelector from './CategorySelector.js'
 import { Button } from 'reactstrap';
 import FaPlusSquare from 'react-icons/lib/fa/plus-square';
+import FaAngleDoubleLeft from 'react-icons/lib/fa/angle-double-left';
+import { setSortOrder } from '../actions/PostActions.js'
 import Book from 'react-icons/lib/fa/book';
 import PropTypes from 'prop-types'
 import { Route } from 'react-router-dom';
@@ -15,10 +16,10 @@ import {
   Nav,
   NavItem,
   NavLink,
-  UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem } from 'reactstrap';
+import { UncontrolledDropdown } from 'reactstrap/lib/Uncontrolled';
 
 class HeaderBar extends Component
 {
@@ -27,6 +28,8 @@ class HeaderBar extends Component
     super(props);
 
     this.toggle = this.toggle.bind(this);
+    this.setSort = this.setSort.bind(this);
+    
     this.state = {
       isOpen: false
     };
@@ -36,7 +39,16 @@ class HeaderBar extends Component
       isOpen: !this.state.isOpen
     });
   }  
-  
+
+  sortOptions = [ { display: "Vote Score", sortField: "voteScore"},
+                       { display: "Timestamp", sortField : "timestamp"} ]
+
+	setSort(event){
+      const newSortField = event.target.name;
+      var newSortAscending = (newSortField === this.props.sortOrderField) ? (!(this.props.sortAscending)) : false;
+      this.props.setSortOrder(((!newSortAscending) ? "-" : "" ) + newSortField);      
+    }
+
   static propTypes = {
         newPost : PropTypes.func.isRequired,
     	categoryFilter: PropTypes.string.isRequired,
@@ -47,12 +59,8 @@ class HeaderBar extends Component
     this.props.newPost()
   }
 
-
   render(){
-    
-    console.log("HeaderBar Render")
-    console.log(this.props.editMode)
-    
+     
    return (
       <div>
        {!(this.props.editMode) ? 
@@ -65,7 +73,20 @@ class HeaderBar extends Component
               <NavItem>
                 <Link to="/posts/create"><NavLink>New Post</NavLink></Link>
               </NavItem>
+
               <UncontrolledDropdown nav inNavbar>
+                <DropdownToggle nav caret>
+                  Sort: { this.props.sortOrderDisplayField + " " + (this.props.sortAscending ? "ASC " : "DESC") }
+                </DropdownToggle>
+                <DropdownMenu >
+      					{this.sortOptions && this.sortOptions.map( (so) =>
+      						<DropdownItem name={so.sortField} onClick={(s) => this.setSort(s)} key={so.sortField}>{so.display}</DropdownItem>     )  }
+                </DropdownMenu>
+              </UncontrolledDropdown>
+
+
+
+			<UncontrolledDropdown nav inNavbar>
                 <DropdownToggle nav caret>
                   Filter: { this.props.categoryFilter==="" ? " Show All" : this.props.categoryFilter }
                 </DropdownToggle>
@@ -80,22 +101,36 @@ class HeaderBar extends Component
               </UncontrolledDropdown>
             </Nav>
           </Collapse>
+        </Navbar>       
+		: 
+		//for the Edit Post / New Post page
+        <Navbar color="primary" dark expand="md">
+          <NavbarBrand><Link to="/" style={{color: "white"}}><FaAngleDoubleLeft /> Return</Link></NavbarBrand>
         </Navbar>
-        
-		: null }
+
+}
       </div>    
     )
 	}
 }
 
 function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
+
+ const sortOptions = [ { display: "Vote Score", sortField: "voteScore"},
+                       { display: "Timestamp", sortField : "timestamp"} ]
   return { 
-	editMode: posts.isEditingPost || posts.isNewPost
+      editMode: posts.isEditingPost || posts.isNewPost,
+      sortOrderDisplayField: sortOptions && 
+          sortOptions.find( (so) => so.sortField === (posts.sortOrder.substring(0,1) === "-" ? posts.sortOrder.substring(1): posts.sortOrder)).display ,
+	  sortOrderField: sortOptions && 
+          sortOptions.find( (so) => so.sortField === (posts.sortOrder.substring(0,1) === "-" ? posts.sortOrder.substring(1): posts.sortOrder)).sortField ,
+      sortAscending: !(posts.sortOrder.substring(0,1) === "-")
   }
 }
 
 function mapDispatchToProps (dispatch) {
   return {
+	setSortOrder: (so) => dispatch(setSortOrder(so))
   }
 }
 

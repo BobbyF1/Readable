@@ -12,6 +12,16 @@ import { connect } from 'react-redux'
 
 class PostsListView extends Component {
 
+  
+    constructor(props) {
+      super(props);
+
+      this.dynamicSort = this.dynamicSort.bind(this)
+
+  }
+
+  
+  
   state={
     navigateToPost : null 
   }
@@ -22,6 +32,18 @@ class PostsListView extends Component {
     	downVote: PropTypes.func.isRequired,
     	editPost: PropTypes.func.isRequired,
   }
+
+ dynamicSort(property) {
+    var sortOrder = 1;
+    if(property[0] === "-") {
+        sortOrder = -1;
+        property = property.substr(1);
+    }
+    return function (a,b) {
+        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+        return result * sortOrder;
+    }
+}
 
 	handleUpvote(e, post){
       this.props.upVote(post)
@@ -52,7 +74,7 @@ class PostsListView extends Component {
       
       return (
       	<ul className="list-group">
-         {posts.map( (post) => 
+         {posts.sort(this.dynamicSort(this.props.postSortOrder)).map( (post) => 
           	<li key={post.id}>
 				<div style={{"marginLeft": "20px", "marginLRight": "20px"}}>
                     <p style={{"textAlign": "left"}}><strong>Category: </strong>{post.category} <br/>
@@ -81,13 +103,13 @@ class PostsListView extends Component {
 
 function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
   return { 
+    postSortOrder: posts.sortOrder,
   }
 }
 
 function mapDispatchToProps (dispatch) {
   return {
-    deletePost: (post) => dispatch(deletePost(post)),
-    editPost: (post) => dispatch(editPost(post)),
+    deletePost: (post) => dispatch(deletePost(post))
   }
 }
 

@@ -1,15 +1,13 @@
 import React, { Component } from 'react'
-import { Col, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
-import FaThumpbsUp from 'react-icons/lib/fa/thumbs-up';
-import FaThumpbsDown from 'react-icons/lib/fa/thumbs-down';
+import { Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import FaEdit from 'react-icons/lib/fa/edit';
 import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import { connect } from 'react-redux'
 import Modal from 'react-modal'
 import moment from 'moment'
 import { Link } from 'react-router-dom'
-import { createPost, saveEditPost } from '../actions/PostActions.js'
-import { editPost } from '../actions/PostActions.js'
+import { deletePost, createPost, saveEditPost, setEditPost, setNewPost } from '../actions/PostActions.js'
+import { Redirect } from 'react-router-dom'
 
 const customStyles={
   content : {
@@ -26,7 +24,8 @@ class EditPost extends Component{
    
   state={
     post: {},
-    validationErrorMessage:""
+    validationErrorMessage:"",
+    returnToRoot: false
   }
 	constructor(props){
       super(props)
@@ -34,8 +33,7 @@ class EditPost extends Component{
       this.handleChange = this.handleChange.bind(this)
       this.handleOK = this.handleOK.bind(this)
       this.requestModalClose = this.requestModalClose.bind(this)
-      this.handleUpvote = this.handleUpvote.bind(this)
-      this.handleDownvote = this.handleDownvote.bind(this)
+      this.handleDelete = this.handleDelete.bind(this)
       
     }
   
@@ -47,29 +45,20 @@ class EditPost extends Component{
       console.log("Goodbye from EDITPOST")
     }
 
-	handleUpvote(){
-      this.setState({ post: {...this.state.post, voteScore: this.state.post.voteScore + 1 } } );
-    }
-
-	handleDownvote(){
-      this.setState({ post: {...this.state.post, voteScore: this.state.post.voteScore - 1 } } );
-    }
-
   componentDidMount(){    
     
-    console.log("consoledidmout")
-    console.log(this.props.mode)
     if(this.props.mode==="edit"){
     	const postId = this.props.match.params.postId
         const editPost = this.props.posts.find( function(p) { return ( p.id ===  postId  ) } )
-    	console.log(editPost)
-      	this.props.editPost(  )
+
+        this.props.setEditPost(true)
      	this.setState( { post:  editPost  } )
 
 	}
 	else{
       	const dateNow = Date.now()
       	const newId = dateNow.toString()
+      	this.props.setNewPost(true)
     	this.setState( { post: { 
                                   id: newId,
                                   timestamp: dateNow,
@@ -96,11 +85,20 @@ class EditPost extends Component{
       }
       else
       {
-		if(this.props.mode==="edit")
+		if(this.props.mode==="edit"){
       		this.props.saveEditPost(this.state.post)
-      	else
-      		this.props.createPost(this.state.post)
+      		this.setState( { returnToRoot: true} );
+	    }
+      	else{
+      			this.props.createPost(this.state.post)
+          		this.setState( { returnToRoot: true} );
+	        }
     	}
+    }
+
+	handleDelete(){
+      	this.props.deletePost(this.state.post)
+      	this.setState( { returnToRoot: true} );
     }
 
   handleChange(e) {
@@ -111,9 +109,11 @@ class EditPost extends Component{
 
 	render(){
       
-      console.log("Rendering EditPost")
-      console.log(this.state)
-      
+      	if (this.state.returnToRoot) {
+          if (window.location.pathname !== "/") {
+            return <Redirect to = { "/" } push={true} /> 		
+          }
+      }      
       return(
       <div className="border" style={{width: "80%", margin: "50px 50px 20px", padding: "20px 20px 50px"}} >
 <h1>TEST</h1>
@@ -172,7 +172,7 @@ class EditPost extends Component{
           </FormGroup>
       	<Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="success" onClick={ (e) => this.handleOK() }><FaEdit /> {(this.props.mode==="edit" ? "Save" : "Create" )}</Button>
 		{this.props.mode==="edit" ?
-         	<Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="danger"><FaTimesCircle />Delete Post</Button> 
+         	<Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="danger" onClick={ (e) => this.handleDelete() }><FaTimesCircle/> Delete Post</Button> 
       	: null }
 		</Form>
 
@@ -208,7 +208,9 @@ function mapDispatchToProps (dispatch) {
   return {
 	createPost: (post) => dispatch(createPost(post)),
     saveEditPost: (post) => dispatch(saveEditPost(post)),
-    editPost: () => dispatch(editPost()),
+    setEditPost: (editPost) => dispatch(setEditPost(editPost)),
+    setNewPost: (newPost) => dispatch(setNewPost(newPost)),
+    deletePost: (deadPost) => dispatch(deletePost(deadPost))
   }
 }
 

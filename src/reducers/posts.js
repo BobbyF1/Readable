@@ -4,10 +4,12 @@ import {
   SET_POST_ZERO_COMMENTS_COUNT,
   UP_VOTE_POST, 
   DOWN_VOTE_POST,
-  EDIT_POST,
+  SET_EDIT_POST,
+  SET_NEW_POST,
   ADD_POST,
   DELETED_POST, 
-  EDITED_POST
+  EDITED_POST,
+  SET_SORT_ORDER
 } from '../actions/PostActions.js'
 
 function posts (state = {
@@ -15,7 +17,8 @@ function posts (state = {
                          isLoaded: false,
                          postsWithCommentCount: 0 ,
                          isEditingPost: false ,
-  						 isNewPost: false
+  						 isNewPost: false,
+  						 sortOrder: "-voteScore"
                         }, action) {
   
   var newData
@@ -25,9 +28,9 @@ function posts (state = {
   switch (action.type) {
       
     case SET_POSTS:
-  		const { posts } = action        
       	return {
-          data: posts,
+          ...state,
+          data: action.posts,
           isLoaded: true, 
           setAllCommentCounts: false,
           postsWithCommentCount: 0,
@@ -38,107 +41,72 @@ function posts (state = {
     case SET_POST_COMMENTS_COUNT:
       	let { postId, commentCount } = action      
       	newData = state.data.map( (post) =>  {return post.id === postId ? Object.assign({}, post, { commentCount: commentCount } ) : post } ) 
-
-      	postsWithCommentCount = state.postsWithCommentCount + 1
-      	newState = { data: newData, 
-                    isLoaded: state.isLoaded, 
-                    setAllCommentCounts: postsWithCommentCount === state.data.length , 
-                    postsWithCommentCount: postsWithCommentCount,
-                    isEditingPost: state.isEditingPost,
-                    isNewPost: state.isNewPost,
-                   }
-      return newState
+      	return {...state, 
+              data: newData, 
+              setAllCommentCounts: postsWithCommentCount === state.data.length,
+              postsWithCommentCount: state.postsWithCommentCount + 1
+             }
       
     case SET_POST_ZERO_COMMENTS_COUNT:
       	postId = action.postId      
       	newData = state.data.map( (post) =>  {return post.id === postId ? Object.assign({}, post, { commentCount: 0 } ) : post } ) 
 
-		postsWithCommentCount = state.postsWithCommentCount + 1
-      	newState = { data: newData, 
-                    isLoaded: state.isLoaded, 
-                    setAllCommentCounts: postsWithCommentCount === state.data.length , 
-                    postsWithCommentCount: postsWithCommentCount,
-                    isEditingPost: state.isEditingPost,
-                    isNewPost: state.isNewPost,
-                   }
-      return newState
+      	return {...state, 
+              data: newData, 
+              postsWithCommentCount: state.postsWithCommentCount + 1,
+              setAllCommentCounts: (state.postsWithCommentCount + 1) === state.data.length
+             }
       
     case UP_VOTE_POST:
       	postId = action.postId
       	newData = state.data.map( (post) =>  {return post.id === postId ? Object.assign({}, post, { voteScore: post.voteScore + 1 } ) : post } )         
-      	newState = { data: newData, 
-                    isLoaded: state.isLoaded, 
-                    setAllCommentCounts: postsWithCommentCount === state.data.length , 
-                    postsWithCommentCount: postsWithCommentCount ,
-                    isEditingPost: state.isEditingPost,
-                    isNewPost: state.isNewPost,
-                   }
-      return newState	
-
+      return {...state,
+              data: newData
+             }
+              
     case DOWN_VOTE_POST:
       	postId = action.postId
       	newData = state.data.map( (post) =>  {return post.id === postId ? Object.assign({}, post, { voteScore: post.voteScore - 1 } ) : post } )         
-      	newState = { data: newData, 
-                    isLoaded: state.isLoaded, 
-                    setAllCommentCounts: postsWithCommentCount === state.data.length , 
-                    postsWithCommentCount: postsWithCommentCount,
-                    isEditingPost: state.isEditingPost,
-                    isNewPost: state.isNewPost,
-                   }
-      	return newState	
+      	return {
+          		...state,
+          		data: newData
+        	}
+      
+    case SET_EDIT_POST:      
+      return {...state, isEditingPost: action.edit};
 
+    case SET_NEW_POST:      
+      return {...state, isNewPost: action.new};
       
-    case EDIT_POST:
-      
-      
-      console.log("IS EDITING POST")
-      console.log("STATE:")
-      console.log(state)
-      console.log("NEXTSTATE:")
-      console.log({...state, isEditingPost: true})
-      return {...state, isEditingPost: true};
-      
-      	newState = { data: state.data, 
-                    isLoaded: state.isLoaded, 
-                    setAllCommentCounts: state.setAllCommentCounts ,
-                    postsWithCommentCount: state.postsWithCommentCount,
-                    isEditingPost: true,
-                    isNewPost: false,
-                   }
-      	return {...state, isEditingPost: true}	
-
     case ADD_POST:
-      	newState = { 
-                    data: [...state.data, action.post],
-                    isLoaded: state.isLoaded, 
-                    setAllCommentCounts: state.setAllCommentCounts , 
-                    postsWithCommentCount: state.postsWithCommentCount,
+      	return {
+          		...state,
+          		data: [...state.data, action.post],
                     isEditingPost: false,
-                    isNewPost: false,
-                   }
-      	return newState	
-
+                    isNewPost: false
+        }
+          		
     case DELETED_POST:
-      	newState = { 
+      	return {
+          			...state,
                     data: state.data.filter( (p) => p.id!==action.postId ),
-                    isLoaded: state.isLoaded, 
-                    setAllCommentCounts: state.setAllCommentCounts , 
-                    postsWithCommentCount: state.postsWithCommentCount,
                     isEditingPost: false,
-                    isNewPost: false,
-                   }
-      	return newState	
+                    isNewPost: false
+        	}          		
 
     case EDITED_POST:
-      	newState = { 
+      	return {
+          		...state,
                     data: state.data.map( (p) => { return p.id===action.post.id ? action.post : p }  ),
-			        isLoaded: state.isLoaded, 
-                    setAllCommentCounts: state.setAllCommentCounts , 
-                    postsWithCommentCount: state.postsWithCommentCount,
                     isEditingPost: false,
-                    isNewPost: false,
-                   }
-      	return newState	
+                    isNewPost: false
+        }
+
+    case SET_SORT_ORDER:
+      	return {
+          	...state,
+          sortOrder: action.sortBy
+        }
       
     default :
       	return state

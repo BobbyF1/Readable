@@ -23,7 +23,6 @@ class App extends Component {
                 />       
               </div>
 
-      			{!this.props.isEditingPost && (    
                     <div className="App">
       					<Switch>
                           <Route exact path="/" component={ListViewContainer} />
@@ -33,7 +32,6 @@ class App extends Component {
                           <Route path="/:cat" component={ListViewContainer} />
       					</Switch>
                     </div>
-      			)}
       		</div>
     	</BrowserRouter>
 	);

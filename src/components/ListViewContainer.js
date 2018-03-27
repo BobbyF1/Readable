@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
-import { upVotePostAction, downVotePostAction } from '../actions/PostActions.js'
+import { setNewPost, setEditPost, upVotePostAction, downVotePostAction } from '../actions/PostActions.js'
 import { setCurrentCategory } from '../actions/CategoryActions.js'
 import { connect } from 'react-redux'
 import Loading from 'react-loading'
 import PostsListView from '../components/PostsListView.js'
-import HeaderBar from './HeaderBar.js'
 import { initialDataLoad, setNavigationError } from '../actions/GenericActions.js'
 
 class ListViewContainer extends Component
@@ -24,6 +23,8 @@ class ListViewContainer extends Component
     componentDidMount() {      
       	if(!(this.props.isLoaded))
           this.props.triggerInitialDataLoad();
+      	this.props.setEditPost(false)
+      	this.props.setNewPost(false)
   	}
   
   	componentWillReceiveProps(nextProps){
@@ -65,6 +66,7 @@ class ListViewContainer extends Component
 
     render(){    
       	const selectedCategory = this.props.match.params.cat ? this.props.match.params.cat : ""
+
 		return (  
       		<div>
 				<div>
@@ -93,7 +95,8 @@ function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
     	categories: categories.data,
         posts: posts.data,
     	isLoaded: generic.loaded,
-    	currentCategory: categories.currentCategory
+    	currentCategory: categories.currentCategory,
+    	
   }
 }
 
@@ -103,7 +106,9 @@ function mapDispatchToProps (dispatch) {
     downVotePost: (post) => dispatch(downVotePostAction(post)),
     triggerInitialDataLoad: () => dispatch( initialDataLoad()),
     setNavigationError: () => dispatch(setNavigationError()),
-    setCurrentCategory: (currentCategory) => dispatch(setCurrentCategory(currentCategory))
+    setCurrentCategory: (currentCategory) => dispatch(setCurrentCategory(currentCategory)),
+    setEditPost: (editPost) => dispatch(setEditPost(editPost)),
+    setNewPost: (newPost) => dispatch(setNewPost(newPost))
   }
 }
 
