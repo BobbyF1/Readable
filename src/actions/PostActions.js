@@ -133,7 +133,6 @@ export function loadPosts() {
       .then( (res) => { return(res.text()) })
       .then ( (data) => {  return JSON.parse(data) } )
       .then( (data) => { dispatch(setPosts(data.filter( (p) => !(p.deleted) ))) ; return (data) } )
-   //   .then(  () => {if( getState().posts.isLoaded )  dispatch(setPostCommentCounts(getState().posts.data)) } ) 
       .catch( (err) => (console.log("Error retrieving posts in loadPosts: "+ err)));
   }
 }
@@ -160,7 +159,7 @@ export function setPostCommentCounts(posts){
                                      }
                                     
                                     } ) 
-            .then( () => { if (getState().posts.setAllCommentCounts) dispatch(finishedLoadingData()) } )
+//            .then( () => { if (getState().posts.setAllCommentCounts) dispatch(finishedLoadingData()) } )
             .catch((err) => (console.log("Error retrieving comment counts: "+ err)));
           })
       	}

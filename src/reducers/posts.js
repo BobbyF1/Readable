@@ -43,7 +43,7 @@ function posts (state = {
       	newData = state.data.map( (post) =>  {return post.id === postId ? Object.assign({}, post, { commentCount: commentCount } ) : post } ) 
       	return {...state, 
               data: newData, 
-              setAllCommentCounts: postsWithCommentCount === state.data.length,
+              setAllCommentCounts: (postsWithCommentCount+1) === state.data.length,
               postsWithCommentCount: state.postsWithCommentCount + 1
              }
       

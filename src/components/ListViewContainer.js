@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import Loading from 'react-loading'
 import PostsListView from '../components/PostsListView.js'
 import { initialDataLoad, setNavigationError } from '../actions/GenericActions.js'
+import { finishedLoadingData } from '../actions/GenericActions.js'
 
 class ListViewContainer extends Component
 {
@@ -31,6 +32,14 @@ class ListViewContainer extends Component
 
       console.log("nextProps")
       console.log(nextProps)
+      
+      
+        
+      if(!(this.props.isAllCommentCountsSet) && nextProps.isAllCommentCountsSet){
+        //just finished setting all comment counts
+        this.props.finishedLoadingData();
+      }
+
       
      if (!(this.props.isPostsLoaded) && nextProps.isPostsLoaded){
        console.log("Posts have just loaded therefore I will load comments and set counts.....")
@@ -104,8 +113,8 @@ function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
         posts: posts.data,
     	isLoaded: generic.loaded,
     	currentCategory: categories.currentCategory,
-    	isPostsLoaded: posts.isLoaded
-    	
+    	isPostsLoaded: posts.isLoaded,
+    	isAllCommentCountsSet: posts.setAllCommentCounts    	
   }
 }
 
@@ -118,7 +127,9 @@ function mapDispatchToProps (dispatch) {
     setCurrentCategory: (currentCategory) => dispatch(setCurrentCategory(currentCategory)),
     setEditPost: (editPost) => dispatch(setEditPost(editPost)),
     setNewPost: (newPost) => dispatch(setNewPost(newPost)),
-    setPostCommentCounts: (posts) => dispatch(setPostCommentCounts(posts))
+    setPostCommentCounts: (posts) => dispatch(setPostCommentCounts(posts)),
+    finishedLoadingData: () => dispatch(finishedLoadingData())
+
   }
 }
 
