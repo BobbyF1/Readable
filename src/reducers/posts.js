@@ -9,7 +9,8 @@ import {
   ADD_POST,
   DELETED_POST, 
   EDITED_POST,
-  SET_SORT_ORDER
+  SET_SORT_ORDER,
+  DECREASE_POST_COMMENT_COUNT
 } from '../actions/PostActions.js'
 
 function posts (state = {
@@ -107,6 +108,13 @@ function posts (state = {
           	...state,
           sortOrder: action.sortBy
         }
+
+    case DECREASE_POST_COMMENT_COUNT:
+      return {
+     	...state, 
+      	data: state.data.map ( (post) => { return post.id===action.postId ? Object.assign({}, post, { commentCount: post.commentCount - 1 } ) : post } )         
+  		}
+      
       
     default :
       	return state

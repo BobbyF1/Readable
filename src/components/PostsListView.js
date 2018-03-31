@@ -78,11 +78,12 @@ class PostsListView extends Component {
           	<li key={post.id}>
 				<div style={{"marginLeft": "20px", "marginLRight": "20px"}}>
                     <blockquote>{post.title}
-                                                                         <footer>
-        <cite>
-            {post.author}
-        </cite>
-    </footer></blockquote>
+                      <footer>
+                        <cite>
+                            {post.author}
+                        </cite>
+                      </footer>
+                    </blockquote>
                     <p><small>Category: <em>{post.category} </em> By: <em>{post.author}</em> Comments: 
 						<em> {post.commentCount ? post.commentCount : 0 }</em> Current score: {post.voteScore} Created: <em>{moment(post.timestamp).format('MMMM Do YYYY, h:mm:ss a') }</em></small></p>
 				</div>

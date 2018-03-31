@@ -7,6 +7,7 @@ import PostsListView from '../components/PostsListView.js'
 import { initialDataLoad, setNavigationError } from '../actions/GenericActions.js'
 import { finishedLoadingData } from '../actions/GenericActions.js'
 
+
 class ListViewContainer extends Component
 {
   constructor(props) {

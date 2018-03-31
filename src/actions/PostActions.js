@@ -13,8 +13,15 @@ export const
 	ADD_POST = 'ADD_POST',
 	DELETED_POST = 'DELETED_POST',
 	EDITED_POST = 'EDITED_POST',
-	SET_SORT_ORDER = 'SET_SORT_ORDER'
+	SET_SORT_ORDER = 'SET_SORT_ORDER',
+	DECREASE_POST_COMMENT_COUNT = 'DECREASE_POST_COMMENT_COUNT'
 
+export function decreasePostCommentCount(postId){
+  return{
+    type: DECREASE_POST_COMMENT_COUNT,
+    postId
+  }
+}
 
 export function setSortOrder(sortBy){
   return{
@@ -218,6 +225,7 @@ export function saveEditPost(post){
    		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
       	.then( data => { dispatch(editedPost(post.id) ) } )
    		.catch( err => console.log('error', err))
-    } 
-  
+    }   
 }
+
+

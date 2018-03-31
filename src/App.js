@@ -22,7 +22,6 @@ class App extends Component {
                     newPost={() => this.newPost()}
                 />       
               </div>
-
                     <div className="App">
       					<Switch>
                           <Route exact path="/" component={ListViewContainer} />

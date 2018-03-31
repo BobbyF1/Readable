@@ -5,9 +5,9 @@ import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import { connect } from 'react-redux'
 import Modal from 'react-modal'
 import moment from 'moment'
-import { Link } from 'react-router-dom'
 import { deletePost, createPost, saveEditPost, setEditPost, setNewPost } from '../actions/PostActions.js'
 import { Redirect } from 'react-router-dom'
+import CommentsListView from './CommentsListView.js'
 
 const customStyles={
   content : {
@@ -115,84 +115,84 @@ class EditPost extends Component{
           }
       }      
       return(
-      <div className="border" style={{width: "80%", margin: "50px 50px 20px", padding: "20px 20px 50px"}} >
-<h1>TEST</h1>
-		<Button onClick={this.test}>Test</Button>
-        <Link to="/" className='close-create-contact'>Close</Link>
-		<h1>{this.props.mode.toUpperCase()} POST</h1>
-        <Form>
-          <FormGroup row>
-              <Label for="Title" sm={2} style={{textAlign: "left"}}>Category</Label>
-              <Col sm={10}>
-				<Input type="select" name="category" id="category" value={this.state.post.category} onChange={this.handleChange} >
-					{ this.props.categories.map( (c) => <option key={c.name}>{c.name}</option>) }
-				</Input>
-              </Col>
-          </FormGroup>
-          <FormGroup row>
-              <Label for="Title" sm={2} style={{textAlign: "left"}}>Title</Label>
-              <Col sm={10}>
-                  <Input type="text" name="title" id="title" value={this.state.post.title} onChange={this.handleChange} 
-						invalid= { (this.state.post.title==="") } />
-              </Col>
-          </FormGroup>
-          <FormGroup row>
-              <Label for="Body" sm={2} style={{textAlign: "left"}}>Body </Label>
-              <Col sm={10}>
-                  <Input type="textarea" name="body" id="body" value={this.state.post.body} onChange={this.handleChange}
-						invalid={ (this.state.post.body==="") } />
-              </Col>
-          </FormGroup>
-          <FormGroup row>
-              <Label for="Author" sm={2} style={{textAlign: "left"}}>Author</Label>
-              <Col sm={10}>
-                  <Input type="text" name="author" id="author" value={this.state.post.author } onChange={this.handleChange} 
-						invalid={ (this.state.post.author==="") }/>
-              </Col>
-          </FormGroup>
-          <FormGroup row>
-              <Label for="NumberofComments" sm={2} style={{textAlign: "left"}}>Comments</Label>
-              <Col sm={5}>
-                  <Input disabled type="text" name="NumberofComments" id="NumberofComments" 
-      						placeholder={this.props.mode==="edit" ? this.state.post.commentCount : "0" } />
-              </Col>
-          </FormGroup>
-          <FormGroup row>
-              <Label for="CurrentScore" sm={2} style={{textAlign: "left"}}>Current Score</Label>
-              <Col sm={5}>      
-                  <Input disabled type="text" name="CurrentScore" id="CurrentScore" value={ this.state.post.voteScore } />      			
-              </Col>
-   
-      	</FormGroup>      
-          <FormGroup row>
-              <Label for="timestamp" sm={2} style={{textAlign: "left"}}>Created</Label>
-              <Col sm={5}>
-                  <Input disabled type="text" name="timestamp" id="timestamp" placeholder={moment(this.state.post.timestamp).format('MMMM Do YYYY, h:mm:ss a')} />
-              </Col>
-          </FormGroup>
-      	<Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="success" onClick={ (e) => this.handleOK() }><FaEdit /> {(this.props.mode==="edit" ? "Save" : "Create" )}</Button>
-		{this.props.mode==="edit" ?
-         	<Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="danger" onClick={ (e) => this.handleDelete() }><FaTimesCircle/> Delete Post</Button> 
-      	: null }
-		</Form>
+        <div>
+        <div className="border" style={{width: "96%", margin: "10px 20px 2% 2%", padding: "20px 20px 50px"}} >
+          <h1>{this.props.mode.toUpperCase()} POST</h1>
+          <Form>
+            <FormGroup row>
+                <Label for="Title" sm={2} style={{textAlign: "left"}}>Category</Label>
+                <Col sm={10}>
+                  <Input type="select" name="category" id="category" value={this.state.post.category} onChange={this.handleChange} >
+                      { this.props.categories.map( (c) => <option key={c.name}>{c.name}</option>) }
+                  </Input>
+                </Col>
+            </FormGroup>
+            <FormGroup row>
+                <Label for="Title" sm={2} style={{textAlign: "left"}}>Title</Label>
+                <Col sm={10}>
+                    <Input type="text" name="title" id="title" value={this.state.post.title} onChange={this.handleChange} 
+                          invalid= { (this.state.post.title==="") } />
+                </Col>
+            </FormGroup>
+            <FormGroup row>
+                <Label for="Body" sm={2} style={{textAlign: "left"}}>Body </Label>
+                <Col sm={10}>
+                    <Input type="textarea" name="body" id="body" value={this.state.post.body} onChange={this.handleChange}
+                          invalid={ (this.state.post.body==="") } />
+                </Col>
+            </FormGroup>
+            <FormGroup row>
+                <Label for="Author" sm={2} style={{textAlign: "left"}}>Author</Label>
+                <Col sm={10}>
+                    <Input type="text" name="author" id="author" value={this.state.post.author } onChange={this.handleChange} 
+                          invalid={ (this.state.post.author==="") }/>
+                </Col>
+            </FormGroup>
+            <FormGroup row>
+                <Label for="NumberofComments" sm={2} style={{textAlign: "left"}}>Comments</Label>
+                <Col sm={5}>
+                    <Input disabled type="text" name="NumberofComments" id="NumberofComments" 
+                              placeholder={this.props.mode==="edit" ? this.state.post.commentCount : "0" } />
+                </Col>
+            </FormGroup>
+            <FormGroup row>
+                <Label for="CurrentScore" sm={2} style={{textAlign: "left"}}>Current Score</Label>
+                <Col sm={5}>      
+                    <Input disabled type="text" name="CurrentScore" id="CurrentScore" value={ this.state.post.voteScore } />      			
+                </Col>
+
+          </FormGroup>      
+            <FormGroup row>
+                <Label for="timestamp" sm={2} style={{textAlign: "left"}}>Created</Label>
+                <Col sm={5}>
+                    <Input disabled type="text" name="timestamp" id="timestamp" placeholder={moment(this.state.post.timestamp).format('MMMM Do YYYY, h:mm:ss a')} />
+                </Col>
+            </FormGroup>
+          {this.props.mode==="edit" ?
+              <Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="danger" onClick={ (e) => this.handleDelete() }><FaTimesCircle/> Delete Post</Button> 
+          : null }
+          </Form>
 
 
-        <Modal
-          overlayClassName='overlay'
-          isOpen={(this.state.validationErrorMessage!=="")}
-          onRequestClose={this.requestModalClose}
-          contentLabel='Modal'
-		  style={customStyles}
-          shouldCloseOnOverlayClick={true}
-		>
-			<div>
-				<p>{this.state.validationErrorMessage}</p>
-				<button onClick={this.requestModalClose}>Close</button>
-			</div>
-		</Modal>
 
-      </div>
-    )
+          <Modal
+            overlayClassName='overlay'
+            isOpen={(this.state.validationErrorMessage!=="")}
+            onRequestClose={this.requestModalClose}
+            contentLabel='Modal'
+            style={customStyles}
+            shouldCloseOnOverlayClick={true}
+          >
+              <div>
+                  <p>{this.state.validationErrorMessage}</p>
+                  <button onClick={this.requestModalClose}>Close</button>
+              </div>
+          </Modal>
+        </div>
+          	<h3 style={{textAlign: "left",  margin: "10px 20px 2% 2%"}}>Comments on this post:</h3>
+          <CommentsListView comments={this.props.comments.filter( (c) => c.parentId===this.state.post.id && !c.deleted) }/>
+	</div>
+)
 	}  
 }
 
@@ -201,6 +201,7 @@ function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
         posts: posts.data,
     	currentCategory: categories.currentCategory,
     	categories: categories.data,
+    	comments: comments.data
   }
 }
 
