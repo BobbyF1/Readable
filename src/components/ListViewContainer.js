@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { setNewPost, setEditPost, upVotePostAction, downVotePostAction } from '../actions/PostActions.js'
+import { setPostCommentCounts, setNewPost, setEditPost, upVotePostAction, downVotePostAction } from '../actions/PostActions.js'
 import { setCurrentCategory } from '../actions/CategoryActions.js'
 import { connect } from 'react-redux'
 import Loading from 'react-loading'
@@ -28,6 +28,14 @@ class ListViewContainer extends Component
   	}
   
   	componentWillReceiveProps(nextProps){
+
+      console.log("nextProps")
+      console.log(nextProps)
+      
+     if (!(this.props.isPostsLoaded) && nextProps.isPostsLoaded){
+       console.log("Posts have just loaded therefore I will load comments and set counts.....")
+       	this.props.setPostCommentCounts(nextProps.posts)
+     }
       
      if (this.props.isLoaded) 
      	this.props.setCurrentCategory(nextProps.match.params.cat ? nextProps.match.params.cat : "" )
@@ -96,6 +104,7 @@ function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
         posts: posts.data,
     	isLoaded: generic.loaded,
     	currentCategory: categories.currentCategory,
+    	isPostsLoaded: posts.isLoaded
     	
   }
 }
@@ -108,7 +117,8 @@ function mapDispatchToProps (dispatch) {
     setNavigationError: () => dispatch(setNavigationError()),
     setCurrentCategory: (currentCategory) => dispatch(setCurrentCategory(currentCategory)),
     setEditPost: (editPost) => dispatch(setEditPost(editPost)),
-    setNewPost: (newPost) => dispatch(setNewPost(newPost))
+    setNewPost: (newPost) => dispatch(setNewPost(newPost)),
+    setPostCommentCounts: (posts) => dispatch(setPostCommentCounts(posts))
   }
 }
 

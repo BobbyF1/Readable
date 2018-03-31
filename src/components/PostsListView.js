@@ -77,14 +77,16 @@ class PostsListView extends Component {
          {posts.sort(this.dynamicSort(this.props.postSortOrder)).map( (post) => 
           	<li key={post.id}>
 				<div style={{"marginLeft": "20px", "marginLRight": "20px"}}>
-                    <p style={{"textAlign": "left"}}><strong>Category: </strong>{post.category} <br/>
-                    <strong> Title: </strong>{post.title}
-                    <strong> By: </strong>{post.author}<br/>
-                    <strong> Comments: </strong>{post.commentCount ? post.commentCount : 0 }
-                    <strong> Current score is </strong>{post.voteScore}
-                    <strong> Created: </strong>{moment(post.timestamp).format('MMMM Do YYYY, h:mm:ss a') }</p>
+                    <blockquote>{post.title}
+                                                                         <footer>
+        <cite>
+            {post.author}
+        </cite>
+    </footer></blockquote>
+                    <p><small>Category: <em>{post.category} </em> By: <em>{post.author}</em> Comments: 
+						<em> {post.commentCount ? post.commentCount : 0 }</em> Current score: {post.voteScore} Created: <em>{moment(post.timestamp).format('MMMM Do YYYY, h:mm:ss a') }</em></small></p>
 				</div>
-                <div className="bg-info clearfix" style={{ padding: '.4rem', "marginLeft": "10px", "marginRight": "10px", "borderRadius": "25px" }}>
+                <div className="bg-info clearfix" style={{ padding: '.4rem', "marginLeft": "10px", "marginRight": "10px", "borderRadius": "5px" }}>
                     <Button className="btn btn-secondary float-left" style={{"marginLeft": "10px"}} size="sm" color="success" onClick={ (e) => this.handleUpvote(e, post) }><FaThumpbsUp /> UpVote Post</Button>{' '}
                     <Button className="btn btn-secondary float-left" style={{margin: "0px 10px"}} size="sm" color="danger" onClick={ (e) => this.handleDownvote(e, post) }><FaThumpbsDown /> DownVote Post</Button>{' '}
                     <Button className="btn btn-primary float-right" style={{margin: "0px 10px"}} size="sm" color="primary" 
@@ -92,7 +94,7 @@ class PostsListView extends Component {
                     <Button className="btn btn-secondary float-right" style={{margin: "0px 10px"}} size="sm" color="secondary"
 						onClick={ (e) => this.props.deletePost(post) } ><FaTimesCircle /> Delete Post</Button>{' '}
 				</div>
-        		<hr style={{"border": "solid"}}/>        		
+        		<hr style={{"border": "dotted"}}/>        		
         </li>
       	)
     	}     

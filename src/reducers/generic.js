@@ -14,7 +14,7 @@ function generic (state = { loaded: false }, action) {
     case NAVIGATION_ERROR:
       return { loaded: true }      
     default :
-      return { loaded: state.loaded }
+      return state;
   }
 }
 
