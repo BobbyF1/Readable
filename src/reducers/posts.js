@@ -44,18 +44,17 @@ function posts (state = {
       	newData = state.data.map( (post) =>  {return post.id === postId ? Object.assign({}, post, { commentCount: commentCount } ) : post } ) 
       	return {...state, 
               data: newData, 
-              setAllCommentCounts: (postsWithCommentCount+1) === state.data.length,
+              setAllCommentCounts: state.postsWithCommentCount + 1 === state.data.length ,
               postsWithCommentCount: state.postsWithCommentCount + 1
              }
       
     case SET_POST_ZERO_COMMENTS_COUNT:
       	postId = action.postId      
       	newData = state.data.map( (post) =>  {return post.id === postId ? Object.assign({}, post, { commentCount: 0 } ) : post } ) 
-
       	return {...state, 
               data: newData, 
               postsWithCommentCount: state.postsWithCommentCount + 1,
-              setAllCommentCounts: (state.postsWithCommentCount + 1) === state.data.length
+              setAllCommentCounts: state.postsWithCommentCount + 1 === state.data.length 
              }
       
     case UP_VOTE_POST:

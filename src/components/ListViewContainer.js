@@ -34,19 +34,20 @@ class ListViewContainer extends Component
       console.log("nextProps")
       console.log(nextProps)
       
-      
-        
-      if(!(this.props.isAllCommentCountsSet) && nextProps.isAllCommentCountsSet){
-        //just finished setting all comment counts
-        this.props.finishedLoadingData();
-      }
 
       
      if (!(this.props.isPostsLoaded) && nextProps.isPostsLoaded){
        console.log("Posts have just loaded therefore I will load comments and set counts.....")
        	this.props.setPostCommentCounts(nextProps.posts)
      }
-      
+
+            
+        
+      if(!(this.props.isAllCommentCountsSet) && nextProps.isAllCommentCountsSet){
+        //just finished setting all comment counts
+        this.props.finishedLoadingData();
+      }
+
      if (this.props.isLoaded) 
      	this.props.setCurrentCategory(nextProps.match.params.cat ? nextProps.match.params.cat : "" )
 

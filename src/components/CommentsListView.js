@@ -43,7 +43,7 @@ class CommentsListView extends Component
       		<div>
                     {this.props.comments.map( (c) => 
     			        <div className="border" style={{width: "96%", margin: "10px 20px 2% 2%", padding: "20px 20px 50px"}} >
-                         <Form>
+                         <Form key={c.id} >
 							<Container>
                           <Row key={c.id} >
                           		<Col xs="9">
