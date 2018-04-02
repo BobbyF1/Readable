@@ -3,8 +3,17 @@ export const
 	ADD_COMMENTS = 'ADD_COMMENTS',
 	DOWN_VOTE_COMMENT = 'DOWN_VOTE_COMMENT',
 	UP_VOTE_COMMENT = 'UP_VOTE_COMMENT',
-	DELETED_COMMENT = 'DELETED_COMMENT'
+	DELETED_COMMENT = 'DELETED_COMMENT',
+	EDITED_COMMENT = 'EDITED_COMMENT'
 
+
+export function editedComment(commentId, body) {
+	return {
+      	type: EDITED_COMMENT,
+      	commentId,
+      	body
+    }
+}
 
 export function downVote (commentId) {
   return {
@@ -75,4 +84,23 @@ export function deleteComment(comment){
    		.catch( err => console.log('error', err))
     }
 }
+
+
+
+
+export function saveEditComment(commentId, body){
+    const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${commentId}`;  
+   	let commentBody = JSON.stringify({
+   		body: body
+ 	})  	
+    return (dispatch, getState) => {
+    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
+                  }, credentials: 'include' , method: 'put' , body: commentBody
+                       })      	
+   		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
+      	.then( data => { dispatch(editedComment(commentId, body) ) } )
+   		.catch( err => console.log('error', err))
+    }   
+}
+
 

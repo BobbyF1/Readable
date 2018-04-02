@@ -17,6 +17,7 @@ export const
 	DECREASE_POST_COMMENT_COUNT = 'DECREASE_POST_COMMENT_COUNT'
 
 export function decreasePostCommentCount(postId){
+  console.log("decreasePostCommentCount")
   return{
     type: DECREASE_POST_COMMENT_COUNT,
     postId
@@ -145,8 +146,6 @@ export function loadPosts() {
 }
 
 export function setPostCommentCounts(posts){
-  console.log(" setPostCommentCounts")
-  console.log(posts)
   	return(dispatch, getState) =>
     {
       if(posts){
@@ -166,7 +165,6 @@ export function setPostCommentCounts(posts){
                                      }
                                     
                                     } ) 
-//            .then( () => { if (getState().posts.setAllCommentCounts) dispatch(finishedLoadingData()) } )
             .catch((err) => (console.log("Error retrieving comment counts: "+ err)));
           })
       	}

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import FaEdit from 'react-icons/lib/fa/edit';
 import FaTimesCircle from 'react-icons/lib/fa/times-circle';
+import TiTick from 'react-icons/lib/ti/tick'
 import { connect } from 'react-redux'
 import Modal from 'react-modal'
 import moment from 'moment'
@@ -75,6 +76,13 @@ class EditPost extends Component{
 	}
   }
 
+	componentWillReceiveProps(nextProps){
+      	if(nextProps.mode==="edit"){     
+          const editPost = nextProps.posts.find( function(p) { return ( p.id ===  nextProps.match.params.postId  ) } )
+          this.setState( { post:  editPost  } )      
+        }
+    }
+
 	requestModalClose(){
         this.setState( { validationErrorMessage: ""} )      
     }
@@ -101,11 +109,13 @@ class EditPost extends Component{
       	this.setState( { returnToRoot: true} );
     }
 
-  handleChange(e) {
-	var newState = Object.assign({}, this.state)	//copy of the current state
-	newState.post[e.target.name] = e.target.value	//set the newly edited value
-    this.setState( newState );
-  }
+    handleChange(e) {
+		var newState = Object.assign({}, this.state)	//copy of the current state
+		newState.post[e.target.name] = e.target.value	//set the newly edited value
+		this.setState( newState );
+
+
+	}
 
 	render(){
       
@@ -116,11 +126,11 @@ class EditPost extends Component{
       }      
       return(
         <div>
-        <div className="border" style={{width: "96%", margin: "10px 20px 2% 2%", padding: "20px 20px 50px"}} >
+        <div className="border" style={{width: "60%", margin: "10px 20px 2% 20%", padding: "10px 10px 0px"}} >
           <h1>{this.props.mode.toUpperCase()} POST</h1>
           <Form>
             <FormGroup row>
-                <Label for="Title" sm={2} style={{textAlign: "left"}}>Category</Label>
+                <Label for="Title" sm={2} style={{textAlign: "left"}}>Category </Label>
                 <Col sm={10}>
                   <Input type="select" name="category" id="category" value={this.state.post.category} onChange={this.handleChange} >
                       { this.props.categories.map( (c) => <option key={c.name}>{c.name}</option>) }
@@ -168,9 +178,19 @@ class EditPost extends Component{
                     <Input disabled type="text" name="timestamp" id="timestamp" placeholder={moment(this.state.post.timestamp).format('MMMM Do YYYY, h:mm:ss a')} />
                 </Col>
             </FormGroup>
-          {this.props.mode==="edit" ?
-              <Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="danger" onClick={ (e) => this.handleDelete() }><FaTimesCircle/> Delete Post</Button> 
-          : null }
+            <FormGroup row>
+              {this.props.mode==="edit" ?
+                <Col sm={12}>
+                    <Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="primary" onClick={ (e) => this.handleOK() }><TiTick/> Save </Button> 
+                    <Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="secondary" onClick={ (e) => this.handleDelete() }><FaTimesCircle/> Delete </Button> 
+                </Col>
+              : null }
+              {this.props.mode==="create" ?
+                <Col sm={12}>
+                  <Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="primary" onClick={ (e) => this.handleOK() }><TiTick/> Create </Button> 
+                </Col>
+              : null }
+            </FormGroup>
           </Form>
 
 
@@ -189,7 +209,7 @@ class EditPost extends Component{
               </div>
           </Modal>
         </div>
-          	<h3 style={{textAlign: "left",  margin: "10px 20px 2% 2%"}}>Comments on this post:</h3>
+          	<h3 style={{width: "60%", margin: "10px 20px 2% 20%", padding: "10px 10px 10px", textAlign: "left"}}>Comments on this post:</h3>
           <CommentsListView comments={this.props.comments.filter( (c) => c.parentId===this.state.post.id && !c.deleted) }/>
 	</div>
 )
