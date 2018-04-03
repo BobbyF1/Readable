@@ -3,7 +3,9 @@ import {
   	DOWN_VOTE_COMMENT,
   	UP_VOTE_COMMENT, 
   	DELETED_COMMENT,
-  	EDITED_COMMENT
+  	EDITED_COMMENT, 
+	ADD_COMMENT, 
+  	SET_ZERO_COMMENTS
 } from '../actions/CommentActions.js'
 
 function comments ( state = { data: [], isLoaded: false} , action) {
@@ -11,6 +13,13 @@ function comments ( state = { data: [], isLoaded: false} , action) {
   var newData;
   
   switch (action.type) {
+      
+    case SET_ZERO_COMMENTS:
+      return { 
+        	...state,
+        	data: [],
+        	isLoaded: true
+      }
       
     case EDITED_COMMENT:
       	newData = state.data.map( (comment) =>  {return comment.id === action.commentId ? Object.assign({}, comment, { body: action.body } ) : comment } ) 
@@ -34,11 +43,11 @@ function comments ( state = { data: [], isLoaded: false} , action) {
         	}
       
     case ADD_COMMENTS:
-		const { addComments } = action        
-        const newComments = [ ...state,
-              	...addComments]
-      	return { data: newComments }
+      	return { ...state, data: [ ...state.data, ...action.addComments] }
 
+	case ADD_COMMENT : 
+      	return {...state, data: [ ...state.data, action.comment] }
+                
     case DELETED_COMMENT:
       	return { ...state, data: state.data.filter( (c) => c.id!==action.commentId ) };
       

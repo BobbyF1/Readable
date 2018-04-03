@@ -69,7 +69,7 @@ class PostsListView extends Component {
       return (
       	<ul className="list-group">
          {posts.sort(this.dynamicSort(this.props.postSortOrder)).map( (post) => 
-			<div className="border" style={{width: "60%", margin: "20px 20px 2px 20%", padding: "20px 20px 10px"}} >
+			<div key={post.id} className="border" style={{width: "60%", margin: "20px 20px 2px 20%", padding: "20px 20px 10px"}} >
 				<div style={{"marginLeft": "20px", "marginRight": "20px"}}>
                     <strong>{post.title}</strong>
                     <p><strong><em>{post.author}</em></strong><small> | Category: <em>{post.category} </em><strong>| </strong> <Comment /> 

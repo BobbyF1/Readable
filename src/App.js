@@ -6,6 +6,7 @@ import ListViewContainer from './components/ListViewContainer.js'
 import EditPost from './components/EditPost.js'
 import Error from './components/Error.js'
 import HeaderBar from './components/HeaderBar.js'
+import Test from './components/Test.js'
 
 class App extends Component {
 
@@ -25,6 +26,7 @@ class App extends Component {
                     <div className="App">
       					<Switch>
                           <Route exact path="/" component={ListViewContainer} />
+                          <Route exact path="/test" component={Test} />
                           <Route exact path="/error" component={Error} />
                           <Route exact path="/posts/create"  render={(props) => <EditPost {...props} mode={"create"}/> } />
                           <Route path="/:cat/:postId" render={(props) => <EditPost {...props} mode={"edit"}/> }  />

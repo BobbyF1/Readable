@@ -10,7 +10,10 @@ import {
   DELETED_POST, 
   EDITED_POST,
   SET_SORT_ORDER,
-  DECREASE_POST_COMMENT_COUNT
+  DECREASE_POST_COMMENT_COUNT, 
+  INCREASE_POST_COMMENT_COUNT,
+  SET_ZERO_POSTS
+  
 } from '../actions/PostActions.js'
 
 function posts (state = {
@@ -27,6 +30,14 @@ function posts (state = {
   var postsWithCommentCount
 
   switch (action.type) {
+
+    case SET_ZERO_POSTS:
+      return {
+        ...state,
+        data: {},
+        isLoaded: true,
+        setAllCommentCounts: true       
+      }
       
     case SET_POSTS:
       	return {
@@ -113,7 +124,12 @@ function posts (state = {
      	...state, 
       	data: state.data.map ( (post) => { return post.id===action.postId ? Object.assign({}, post, { commentCount: post.commentCount - 1 } ) : post } )         
   		}
-      
+ 
+    case INCREASE_POST_COMMENT_COUNT:
+      return {
+     	...state, 
+      	data: state.data.map ( (post) => { return post.id===action.postId ? Object.assign({}, post, { commentCount: post.commentCount + 1 } ) : post } )         
+  		}
       
     default :
       	return state

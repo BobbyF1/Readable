@@ -1,90 +1,106 @@
 import React, { Component } from 'react'
-import { Col, Button, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Button, Form, FormGroup, Label, Input, Container } from 'reactstrap';
 import FaEdit from 'react-icons/lib/fa/edit';
 import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import TiTick from 'react-icons/lib/ti/tick'
 import { connect } from 'react-redux'
-import Modal from 'react-modal'
+import Modal from 'react-responsive-modal'
 import moment from 'moment'
 import { deletePost, createPost, saveEditPost, setEditPost, setNewPost } from '../actions/PostActions.js'
+import { createComment } from  '../actions/CommentActions.js'
 import { Redirect } from 'react-router-dom'
 import CommentsListView from './CommentsListView.js'
+import MdAdd from 'react-icons/lib/md/add'
+import { loadLogicStart, loadLogicProgress } from './LoadLogic.js'
+import { initialDataLoad, setNavigationError } from '../actions/GenericActions.js'
+import { setPostCommentCounts } from '../actions/PostActions.js'
+import { finishedLoadingData } from '../actions/GenericActions.js'
+import { setCurrentCategory } from '../actions/CategoryActions.js'
 
-const customStyles={
-  content : {
-    top                   : '50%',
-    left                  : '50%',
-    right                 : 'auto',
-    bottom                : 'auto',
-    marginRight           : '-50%',
-    transform             : 'translate(-50%, -50%)'
-  }
-};
 
 class EditPost extends Component{
-   
-  state={
-    post: {},
-    validationErrorMessage:"",
-    returnToRoot: false
+
+  state = ({
+    		post: {},
+    		returnToRoot: false, 
+    		openNewCommentModal: false,
+    		newComment: { comment: "", author: "" } 
+		})
+
+  constructor(props){
+      super(props)      
+		this.handleChange = this.handleChange.bind(this)
+		this.handleOK = this.handleOK.bind(this)
+		this.requestModalClose = this.requestModalClose.bind(this)
+		this.handleDelete = this.handleDelete.bind(this)
+		this.handleNewComment = this.handleNewComment.bind(this)     
+    	this.handleNewCommentChange = this.handleNewCommentChange.bind(this)
+		this.titleCase = this.titleCase.bind(this)
   }
-	constructor(props){
-      super(props)
-      
-      this.handleChange = this.handleChange.bind(this)
-      this.handleOK = this.handleOK.bind(this)
-      this.requestModalClose = this.requestModalClose.bind(this)
-      this.handleDelete = this.handleDelete.bind(this)
-      
-    }
-  
-	componentWillMount(){
-      Modal.setAppElement('body');
-    }
 
-	componentWillUnmount() {
-      console.log("Goodbye from EDITPOST")
-    }
-
-  componentDidMount(){    
-    
-    if(this.props.mode==="edit"){
-    	const postId = this.props.match.params.postId
-        const editPost = this.props.posts.find( function(p) { return ( p.id ===  postId  ) } )
-
-        this.props.setEditPost(true)
-     	this.setState( { post:  editPost  } )
-
-	}
-	else{
-      	const dateNow = Date.now()
-      	const newId = dateNow.toString()
-      	this.props.setNewPost(true)
-    	this.setState( { post: { 
-                                  id: newId,
-                                  timestamp: dateNow,
-                                  title: "New Post",
-                                  body: "New Post Body",
-                                  author: "Author",
-                                  category: ( this.props.currentCategory!=="" ? this.props.currentCategory :
-                                      this.props.categories.length>0 ? this.props.categories[0].name : "" ),
-                                  voteScore: 0,
-                                  commentCount: 0,
-                                  deleted: false
-                             } 
-					} )
-	}
+	componentDidMount(){       
+      	console.log("componentDidMount")
+      	console.log(this.props)
+      loadLogicStart(this.props)
   }
+
+  	validateCategory(cat){
+      	//detect if they've navigated here by typing /madeupcategory in the URL
+
+      	if ( this.props.categories.length>0 && cat !== "" )
+        {
+          if ( this.props.categories.filter( (c) => c.name===cat).length===0)
+            {
+                this.props.setNavigationError()
+                this.props.history.push('/error')	//should do this from the Action....
+            }
+        }      
+    } 
 
 	componentWillReceiveProps(nextProps){
-      	if(nextProps.mode==="edit"){     
+      	console.log("------------------------------------------------------- componentWillReceiveProps")
+ 		loadLogicProgress(this.props, nextProps, this.validateCategory);
+      
+      if(this.props.isLoaded){
+      if(this.props.mode==="edit"){
+          const postId = this.props.match.params.postId
+          const editPost = this.props.posts.find( function(p) { return ( p.id ===  postId  ) } )
+
+          this.props.setEditPost(true)
+          this.setState( { post:  editPost  } )
+      }
+      else{
+          const dateNow = Date.now()
+          const newId = dateNow.toString()
+          this.props.setNewPost(true)
+          this.setState( { post: { 
+                                    id: newId,
+                                    timestamp: dateNow,
+                                    title: "New Post",
+                                    body: "New Post Body",
+                                    author: "anonymous",
+                                    category: ( this.props.currentCategory!=="" ? this.props.currentCategory :
+                                        this.props.categories.length>0 ? this.props.categories[0].name : "" ),
+                                    voteScore: 0,
+                                    commentCount: 0,
+                                    deleted: false
+                               } 
+                      } )
+      }      
+
+	if(nextProps.mode==="edit"){     
           const editPost = nextProps.posts.find( function(p) { return ( p.id ===  nextProps.match.params.postId  ) } )
           this.setState( { post:  editPost  } )      
         }
     }
+}
+
+ 	titleCase(str) {
+    return str.toLowerCase().split(' ').map(x=>x[0].toUpperCase()+x.slice(1)).join(' ');
+  }
 
 	requestModalClose(){
-        this.setState( { validationErrorMessage: ""} )      
+        this.setState( { openNewCommentModal: false} )      
     }
 
 	handleOK(){
@@ -104,6 +120,17 @@ class EditPost extends Component{
     	}
     }
 
+	handleNewComment(){
+      	//display the modal "new comment" window
+      	this.setState( { openNewCommentModal: true, newComment: { body: "New Comment", author: "anonymous" }  } )
+    }
+
+	handleEditCommentCancel(){
+      	//close the modal "new comment" window
+      	this.setState( { openNewCommentModal: false } )
+      
+    }
+
 	handleDelete(){
       	this.props.deletePost(this.state.post)
       	this.setState( { returnToRoot: true} );
@@ -113,9 +140,27 @@ class EditPost extends Component{
 		var newState = Object.assign({}, this.state)	//copy of the current state
 		newState.post[e.target.name] = e.target.value	//set the newly edited value
 		this.setState( newState );
-
-
 	}
+
+	handleNewCommentChange(e){
+		var newState = Object.assign({}, this.state)	//copy of the current state
+		newState.newComment[e.target.name] = e.target.value	//set the newly edited value
+		this.setState( newState );
+    }
+  
+  	handleEditCommentOK(){
+      	//create a new comment and then close the modal
+      	
+      	const newComment = {
+          	parentId: this.props.match.params.postId,
+          	body: this.state.newComment.body,
+          	author: this.state.newComment.author
+        }
+      
+      	this.props.createComment(newComment)
+      	this.setState( { openNewCommentModal: false } )      
+    }
+
 
 	render(){
       
@@ -123,11 +168,44 @@ class EditPost extends Component{
           if (window.location.pathname !== "/") {
             return <Redirect to = { "/" } push={true} /> 		
           }
-      }      
+      } 
+          
       return(
         <div>
+        
+          <Modal
+            open={this.state.openNewCommentModal}
+            onClose={this.requestModalClose}
+			closeOnOverlayClick={false}
+			little
+          	styles={ {modal: {height: "30%", width: "60%"} }	}
+          >
+          	<div className="border" style={{width: "95%", margin: "10px 0px 0px 0px", padding: "10px 10px 0px"}} >
+        	<h1>New Comment</h1>
+            <FormGroup row>
+                <Label for="Comment" sm={2} style={{textAlign: "left"}}>Comment </Label>
+                <Col sm={10}>
+                    <Input type="textarea" name="body" id="body" value={this.state.newComment.body} onChange={this.handleNewCommentChange}  />
+                </Col>
+            </FormGroup>
+            <FormGroup row>
+                <Label for="Author" sm={2} style={{textAlign: "left"}}>Author</Label>
+                <Col sm={10}>
+                    <Input type="text" name="author" id="author" value={this.state.newComment.author } onChange={this.handleNewCommentChange} />
+                </Col>
+            </FormGroup>
+							<Col sm={12}>
+                                <Button className="btn float-right" style={{margin: "10px", width: "100px"}} size="sm" 
+      								color="primary" onClick={(e) => this.handleEditCommentOK()}><TiTick/> Done </Button> 
+                                <Button className="btn float-right" style={{margin: "10px", width: "100px"}} size="sm" 
+      								color="secondary" onClick={(e) => this.handleEditCommentCancel()}><FaTimesCircle/> Cancel </Button> 
+							</Col>
+          	</div>
+          </Modal>
+        
+        
         <div className="border" style={{width: "60%", margin: "10px 20px 2% 20%", padding: "10px 10px 0px"}} >
-          <h1>{this.props.mode.toUpperCase()} POST</h1>
+          <h1>{this.titleCase(this.props.mode.toUpperCase() + ' Post')}</h1>
           <Form>
             <FormGroup row>
                 <Label for="Title" sm={2} style={{textAlign: "left"}}>Category </Label>
@@ -166,7 +244,7 @@ class EditPost extends Component{
                 </Col>
             </FormGroup>
             <FormGroup row>
-                <Label for="CurrentScore" sm={2} style={{textAlign: "left"}}>Current Score</Label>
+                <Label for="CurrentScore" sm={2} style={{textAlign: "left"}}>Vote Score</Label>
                 <Col sm={5}>      
                     <Input disabled type="text" name="CurrentScore" id="CurrentScore" value={ this.state.post.voteScore } />      			
                 </Col>
@@ -193,27 +271,24 @@ class EditPost extends Component{
             </FormGroup>
           </Form>
 
-
-
-          <Modal
-            overlayClassName='overlay'
-            isOpen={(this.state.validationErrorMessage!=="")}
-            onRequestClose={this.requestModalClose}
-            contentLabel='Modal'
-            style={customStyles}
-            shouldCloseOnOverlayClick={true}
-          >
-              <div>
-                  <p>{this.state.validationErrorMessage}</p>
-                  <button onClick={this.requestModalClose}>Close</button>
-              </div>
-          </Modal>
         </div>
-          	<h3 style={{width: "60%", margin: "10px 20px 2% 20%", padding: "10px 10px 10px", textAlign: "left"}}>Comments on this post:</h3>
+		{ this.props.mode==="edit" ? 
+         <div>
+          <Container style={{width: "60%", margin: "0px 0px 0px 20%", padding: "10px 10px 10px", textAlign: "left"}}>
+          <Row>
+              <Col xs="8">
+                  <h3>Comments on this Post:</h3>
+              </Col>
+              <Col xs="4">
+                  <Button className="btn float-right" style={{margin: "10px", width: "100px"}} size="sm" 
+                                      color="success" onClick={ (e) => this.handleNewComment() }><MdAdd/> New </Button> 
+              </Col>
+          </Row>
+          </Container>
           <CommentsListView comments={this.props.comments.filter( (c) => c.parentId===this.state.post.id && !c.deleted) }/>
+		</div> : null } 
 	</div>
-)
-	}  
+	)}  
 }
 
 function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
@@ -221,7 +296,10 @@ function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
         posts: posts.data,
     	currentCategory: categories.currentCategory,
     	categories: categories.data,
-    	comments: comments.data
+    	comments: comments.data,
+    	isLoaded: generic.loaded,
+    	isPostsLoaded: posts.isLoaded,
+    	isAllCommentCountsSet: posts.setAllCommentCounts    	
   }
 }
 
@@ -231,7 +309,13 @@ function mapDispatchToProps (dispatch) {
     saveEditPost: (post) => dispatch(saveEditPost(post)),
     setEditPost: (editPost) => dispatch(setEditPost(editPost)),
     setNewPost: (newPost) => dispatch(setNewPost(newPost)),
-    deletePost: (deadPost) => dispatch(deletePost(deadPost))
+    deletePost: (deadPost) => dispatch(deletePost(deadPost)), 
+    createComment: (newComment) => dispatch(createComment(newComment)),
+    triggerInitialDataLoad: () => dispatch( initialDataLoad()),
+   	setPostCommentCounts: (posts) => dispatch(setPostCommentCounts(posts)),
+    finishedLoadingData: () => dispatch(finishedLoadingData()),
+    setCurrentCategory: (currentCategory) => dispatch(setCurrentCategory(currentCategory)),
+
   }
 }
 

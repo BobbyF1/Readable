@@ -1,10 +1,18 @@
-import { decreasePostCommentCount } from './PostActions.js'
+import { increasePostCommentCount, decreasePostCommentCount } from './PostActions.js'
 export const
 	ADD_COMMENTS = 'ADD_COMMENTS',
 	DOWN_VOTE_COMMENT = 'DOWN_VOTE_COMMENT',
 	UP_VOTE_COMMENT = 'UP_VOTE_COMMENT',
 	DELETED_COMMENT = 'DELETED_COMMENT',
-	EDITED_COMMENT = 'EDITED_COMMENT'
+	EDITED_COMMENT = 'EDITED_COMMENT',
+	ADD_COMMENT = 'ADD_COMMENT', 
+	SET_ZERO_COMMENTS = 'SET_ZERO_COMMENTS'
+
+export function setZeroComments(){
+  	return {
+      	type: SET_ZERO_COMMENTS
+    }  
+}
 
 
 export function editedComment(commentId, body) {
@@ -32,6 +40,13 @@ export function addComments ( comments ) {
   return {
     type: ADD_COMMENTS,
     addComments: comments,
+  }
+}
+
+export function addNewComment ( comment ) {  
+  return {
+    type: ADD_COMMENT,
+    comment,
   }
 }
 
@@ -102,5 +117,44 @@ export function saveEditComment(commentId, body){
    		.catch( err => console.log('error', err))
     }   
 }
+
+
+export function createComment(comment){
+	const dateNow = Date.now()
+  	const newId = dateNow.toString()
+    
+    comment = { ...comment, 
+    	id: newId,
+  		timestamp: dateNow,
+        voteScore: 1,
+        deleted: false,
+		parentDelete: false
+    }  
+  
+   	let commentBody = JSON.stringify({
+   		id: comment.id,
+      	parentId: comment.parentId,
+   		timestamp: comment.timestamp,
+   		body: comment.body,
+   		author: comment.author, 
+      	voteScore: comment.voteScore,
+      	deleted: comment.deleted,
+      	parentDelete: comment.parentDelete
+ 	})
+    const urlPost = `${process.env.REACT_APP_BACKEND}/comments`;  
+  	return (dispatch, getState) => {
+    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
+                  }, credentials: 'include' , method: 'post',     		
+     		body: commentBody
+                       })      	
+   		.then( response => response.json())
+   		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
+      	.then( data => { dispatch(addNewComment(comment) ) } )
+      	.then( data => { dispatch(increasePostCommentCount(comment.parentId) ) } )
+   		.catch( err => console.log('error', err))
+    }
+}
+
+
 
 

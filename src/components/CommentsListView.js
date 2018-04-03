@@ -68,7 +68,7 @@ class CommentsListView extends Component
 	return(      
 		<div>
 			{this.props.comments.map( (c) =>
-				<div className="border" style={{width: "60%", margin: "10px 20px 2% 20%", padding: "10px 10px 0px"}} >
+				<div key={"edit"+c.id} className="border" style={{width: "60%", margin: "10px 20px 2% 20%", padding: "10px 10px 0px"}} >
 				{ this.state.editingCommentId && this.state.editingCommentId===c.id ?
 				//-----------------------------edit mode-
 					<Form>
@@ -85,7 +85,7 @@ class CommentsListView extends Component
       			</Form>
 				//-----------------------------edit mode-
 				:
-				<div>
+				<div key={c.id}>
       				<Row>
                       <Col xs="9">
                           <p key={c.id} style={{textAlign: 'left', margin: "1px 1px"}}>

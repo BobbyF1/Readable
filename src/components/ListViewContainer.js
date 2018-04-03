@@ -6,6 +6,7 @@ import Loading from 'react-loading'
 import PostsListView from '../components/PostsListView.js'
 import { initialDataLoad, setNavigationError } from '../actions/GenericActions.js'
 import { finishedLoadingData } from '../actions/GenericActions.js'
+import { loadLogicStart, loadLogicProgress } from './LoadLogic.js'
 
 
 class ListViewContainer extends Component
@@ -22,26 +23,24 @@ class ListViewContainer extends Component
     
   }
 
-    componentDidMount() {      
-      	if(!(this.props.isLoaded))
-          this.props.triggerInitialDataLoad();
+    componentDidMount() {
+      	console.log("componentDidMount")
+      	console.log(this.props)
+       loadLogicStart(this.props)
       	this.props.setEditPost(false)
       	this.props.setNewPost(false)
   	}
   
   	componentWillReceiveProps(nextProps){
 
-      console.log("nextProps")
-      console.log(nextProps)
-      
+       loadLogicProgress(this.props, nextProps, this.validateCategory);
 
-      
+      /*
      if (!(this.props.isPostsLoaded) && nextProps.isPostsLoaded){
        console.log("Posts have just loaded therefore I will load comments and set counts.....")
        	this.props.setPostCommentCounts(nextProps.posts)
      }
-
-            
+  
         
       if(!(this.props.isAllCommentCountsSet) && nextProps.isAllCommentCountsSet){
         //just finished setting all comment counts
@@ -55,6 +54,7 @@ class ListViewContainer extends Component
           	if (nextProps.match.params.cat)
               	this.validateCategory(nextProps.match.params.cat)
         }
+        */
     }
   
   
@@ -89,9 +89,11 @@ class ListViewContainer extends Component
 		return (  
       		<div>
 				<div>
-                     { this.props.isLoaded === false ? 
-                            <Loading delay={5} type='spin' color='#222' className='loading' /> 
-                    :      
+                     {this.props.isLoaded  === false ? 
+                      		<div style={{width: "20%", height: "20%", margin: "20% 60% 40% 40%", padding: "10px 10px 0px", textAlign: "center"}} >
+	                            <Loading delay={1} type='spinningBubbles' height='40%' width='40%' color='#222' className='loading' /> 
+                        	</div>
+                  :      
                 <div>
 					<div>
                   		<PostsListView posts={this.props.posts? this.props.posts.length > 0 ? 
