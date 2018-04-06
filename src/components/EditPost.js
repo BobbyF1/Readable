@@ -3,7 +3,6 @@ import { Row, Col, Button, Form, FormGroup, Label, Input, Container } from 'reac
 import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import TiTick from 'react-icons/lib/ti/tick'
 import { connect } from 'react-redux'
-import Modal from 'react-responsive-modal'
 import moment from 'moment'
 import { deletePost, createPost, saveEditPost, setEditPost, setNewPost } from '../actions/PostActions.js'
 import { loadCommentsForPost, createComment } from  '../actions/CommentActions.js'
@@ -12,12 +11,10 @@ import CommentsListView from './CommentsListView.js'
 import MdAdd from 'react-icons/lib/md/add'
 import { setCurrentCategory } from '../actions/CategoryActions.js'
 import Loading from 'react-loading'
-
-
+import NewCommentModal from './NewCommentModal.js'
 
 class EditPost extends Component{
-
-  state = {
+    state = {
     		post: {},
     		returnToRoot: false, 
     		openNewCommentModal: false,
@@ -34,6 +31,7 @@ class EditPost extends Component{
 		this.handleDelete = this.handleDelete.bind(this)
 		this.handleNewComment = this.handleNewComment.bind(this)     
     	this.handleNewCommentChange = this.handleNewCommentChange.bind(this)
+    	this.handleNewCommentOK = this.handleNewCommentOK.bind(this)
 		this.titleCase = this.titleCase.bind(this)
     	this.load = this.load.bind(this)
   }
@@ -89,7 +87,6 @@ class EditPost extends Component{
 
   	validateCategory(cat){
       	//detect if they've navigated here by typing /madeupcategory in the URL
-
       	if ( this.props.categories.length>0 && cat !== "" )
         {
           if ( this.props.categories.filter( (c) => c.name===cat).length===0)
@@ -101,24 +98,23 @@ class EditPost extends Component{
     } 
 
 	titleCase(str) {
-    return str.toLowerCase().split(' ').map(x=>x[0].toUpperCase()+x.slice(1)).join(' ');
-  }
+        return str.toLowerCase().split(' ').map(x=>x[0].toUpperCase()+x.slice(1)).join(' ');
+    }
 
 	requestModalClose(){
         this.setState( { openNewCommentModal: false} )      
     }
 
 	handleOK(){
-      if(this.state.post.title === "" || this.state.post.body === "" || this.state.post.category === "" || this.state.post.author === ""){
-        this.setState( { validationErrorMessage: "A post must have a Category, Title, Body and Author."} )
-      }
-      else
-      {
-		if(this.props.mode==="edit"){
-      		this.props.saveEditPost(this.state.post)
-      		this.setState( { returnToRoot: true} );
-	    }
-      	else{
+		if(this.state.post.title === "" || this.state.post.body === "" || this.state.post.category === "" || this.state.post.author === ""){
+			this.setState( { validationErrorMessage: "A post must have a Category, Title, Body and Author."} )
+		}
+		else{
+			if(this.props.mode==="edit"){
+				this.props.saveEditPost(this.state.post)
+				this.setState( { returnToRoot: true} );
+            }
+      		else{
       			this.props.createPost(this.state.post)
           		this.setState( { returnToRoot: true} );
 	        }
@@ -127,13 +123,8 @@ class EditPost extends Component{
 
 	handleNewComment(){
       	//display the modal "new comment" window
-      	this.setState( { openNewCommentModal: true, newComment: { body: "New Comment", author: "anonymous" }  } )
-    }
-
-	handleEditCommentCancel(){
-      	//close the modal "new comment" window
-      	this.setState( { openNewCommentModal: false } )
-      
+      	console.log("handleNewComment")
+      	this.setState( { openNewCommentModal: true, newComment: { body: "New Comment", author: "anonymous" }  }, function(){ console.log(this.state) }  )
     }
 
 	handleDelete(){
@@ -153,66 +144,36 @@ class EditPost extends Component{
 		this.setState( newState );
     }
   
-  	handleEditCommentOK(){
-      	//create a new comment and then close the modal
-      	
+  	handleNewCommentOK(nc){
       	const newComment = {
-          	parentId: this.props.match.params.postId,
-          	body: this.state.newComment.body,
-          	author: this.state.newComment.author
-        }
-      
+          	parentId: this.state.post.id, 
+          	body: nc.body,
+          	author: nc.author
+        }      
       	this.props.createComment(newComment)
       	this.setState( { openNewCommentModal: false } )      
-    }
+	}
 
-
-	render(){
-      
+	render(){      
       	if (this.state.returnToRoot) {
           if (window.location.pathname !== "/") {
             return <Redirect to = { "/" } push={true} /> 		
           }
       } 
           
-      return(
-        <div>
-        
-                            {!(this.props.isCategoriesLoaded && this.props.isPostsLoaded && this.state.isCommentsLoaded) ? 
-                      		<div style={{width: "20%", height: "20%", margin: "20% 60% 40% 40%", padding: "10px 10px 0px", textAlign: "center"}} >
-	                            <Loading delay={1} type='spinningBubbles' height='40%' width='40%' color='#222' className='loading' /> 
-                        	</div>
-		: 
-        <div>
-          <Modal
-            open={this.state.openNewCommentModal}
-            onClose={this.requestModalClose}
-			closeOnOverlayClick={false}
-			little
-          	styles={ {modal: {height: "30%", width: "60%"} }	}
-          >
-          	<div className="border" style={{width: "95%", margin: "10px 0px 0px 0px", padding: "10px 10px 0px"}} >
-        	<h1>New Comment</h1>
-            <FormGroup row>
-                <Label for="Comment" sm={2} style={{textAlign: "left"}}>Comment </Label>
-                <Col sm={10}>
-                    <Input type="textarea" name="body" id="body" value={this.state.newComment.body} onChange={this.handleNewCommentChange}  />
-                </Col>
-            </FormGroup>
-            <FormGroup row>
-                <Label for="Author" sm={2} style={{textAlign: "left"}}>Author</Label>
-                <Col sm={10}>
-                    <Input type="text" name="author" id="author" value={this.state.newComment.author } onChange={this.handleNewCommentChange} />
-                </Col>
-            </FormGroup>
-							<Col sm={12}>
-                                <Button className="btn float-right" style={{margin: "10px", width: "100px"}} size="sm" 
-      								color="primary" onClick={(e) => this.handleEditCommentOK()}><TiTick/> Done </Button> 
-                                <Button className="btn float-right" style={{margin: "10px", width: "100px"}} size="sm" 
-      								color="secondary" onClick={(e) => this.handleEditCommentCancel()}><FaTimesCircle/> Cancel </Button> 
-							</Col>
-          	</div>
-          </Modal>
+	return(
+		<div> 
+			{!(this.props.isCategoriesLoaded && this.props.isPostsLoaded && this.state.isCommentsLoaded) ? 
+				<div style={{width: "20%", height: "20%", margin: "20% 60% 40% 40%", padding: "10px 10px 0px", textAlign: "center"}} >
+					<Loading delay={1} type='spinningBubbles' height='40%' width='40%' color='#222' className='loading' /> 
+				</div>
+			: 
+				<div>
+      				<NewCommentModal open={this.state.openNewCommentModal} 
+      								newComment={this.state.newComment}
+      								newCommentChange={this.handleNewCommentChange}
+      								newCommentOK={this.handleNewCommentOK}
+      								newCommentCancel={this.handleNewCommentCancel} />
         
         
         <div className="border" style={{width: "60%", margin: "10px 20px 2% 20%", padding: "10px 10px 0px"}} >
