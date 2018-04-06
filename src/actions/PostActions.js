@@ -1,11 +1,6 @@
-import { setZeroComments, addComments } from './CommentActions.js'
-import { finishedLoadingData } from './GenericActions.js'
-
 export const 
 	SET_POSTS = 'SET_POSTS',
-	SET_POST_COMMENTS_COUNT = 'SET_POST_COMMENTS_COUNT',
 	LOAD_POSTS = 'LOAD_POSTS',
-	SET_POST_ZERO_COMMENTS_COUNT = 'SET_POST_ZERO_COMMENTS_COUNT',
 	UP_VOTE_POST = 'UP_VOTE_POST',
 	DOWN_VOTE_POST = 'DOWN_VOTE_POST',
 	SET_EDIT_POST = 'SET_EDIT_POST', 
@@ -15,8 +10,7 @@ export const
 	EDITED_POST = 'EDITED_POST',
 	SET_SORT_ORDER = 'SET_SORT_ORDER',
 	DECREASE_POST_COMMENT_COUNT = 'DECREASE_POST_COMMENT_COUNT', 
-	INCREASE_POST_COMMENT_COUNT = 'INCREASE_POST_COMMENT_COUNT', 
-	SET_ZERO_POSTS = 'SET_ZERO_POSTS'
+	INCREASE_POST_COMMENT_COUNT = 'INCREASE_POST_COMMENT_COUNT'
 
 export function decreasePostCommentCount(postId){
   return{
@@ -31,7 +25,6 @@ export function increasePostCommentCount(postId){
     postId
   }
 }
-
 
 export function setSortOrder(sortBy){
   return{
@@ -88,33 +81,11 @@ export function upVote (postId) {
   }
 }
 
-export function setZeroPosts(){
-  	return {
-      	type: SET_ZERO_POSTS      
-    }
-}
-
 export function setPosts ( posts ) {
   return {
     type: SET_POSTS,
     posts,
   }
-}
-
-export function setCommentsCount ( post, commentCount ) {  
-  return {
-    type: SET_POST_COMMENTS_COUNT,
-    postId: post.id,
-    commentCount
-  }
-}
-
-export function setZeroCommentsCount ( post ) {
-  return {
-    type: SET_POST_ZERO_COMMENTS_COUNT,
-    postId: post.id,
-  }
-  
 }
 
 export function downVotePostAction(postId){ 
@@ -148,48 +119,15 @@ export function upVotePostAction(postId){
 }
 
 export function loadPosts() {
-
   const urlPost = `${process.env.REACT_APP_BACKEND}/posts`;
   return (dispatch, getState) =>
   {  
   	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' }, credentials: 'include' } )
       .then( (res) => { return(res.text()) })
       .then ( (data) => {  return JSON.parse(data) } )
-      .then ( (data) => {  console.log(data); return data } )
       .then( (data) => { dispatch(setPosts(data.filter( (p) => !(p.deleted) ))) ; return (data) } )
       .catch( (err) => (console.log("Error retrieving posts in loadPosts: "+ err)));
   }
-}
-
-export function setPostCommentCounts(posts){
-  	return(dispatch, getState) =>
-    {
-      if(posts && posts.length>0){
-        posts.forEach( function(post) {
-          const urlPostComments = `${process.env.REACT_APP_BACKEND}/posts/${post.id}/comments`;
-          fetch(urlPostComments, { headers: { 'Authorization': 'whatever-you-want' }, credentials: 'include' }  )
-            .then( (res) => { return(res.text()) })
-            .then ( (data) => {return (JSON.parse(data))})
-          	.then ( (data) => {return (data.filter ( (c) => !(c.deleted) ) ) } )
-            .then ( (parsedData ) => { if (parsedData.length > 0)  
-          							{	dispatch(addComments(parsedData)) 
-                                      	dispatch(setCommentsCount (post, parsedData.length)) 
-                                    }
-                                     else
-                                     {
-                                       	dispatch(setZeroCommentsCount(post))
-                                     }
-                                    
-                                    } ) 
-            .catch((err) => (console.log("Error retrieving comment counts: "+ err)));
-          })
-      	}
-      else{
-        //no posts to load
-        dispatch(setZeroPosts())
-        dispatch(setZeroComments())
-      }
-	}
 }
 
 export function createPost(post){
@@ -208,11 +146,7 @@ export function createPost(post){
      		body: postBody
                        })      	
    		.then( response => response.json())
-   		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
-      	.then( data => { dispatch(addPost({
-          	...data,
-          	commentCount: 0
-        })) } )
+      	.then( data => { dispatch(addPost(data))})
    		.catch( err => console.log('error', err))
     }
 }

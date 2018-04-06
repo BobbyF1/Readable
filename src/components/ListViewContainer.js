@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
-import { setPostCommentCounts, setNewPost, setEditPost, upVotePostAction, downVotePostAction } from '../actions/PostActions.js'
+import { setNewPost, setEditPost, upVotePostAction, downVotePostAction } from '../actions/PostActions.js'
 import { setCurrentCategory } from '../actions/CategoryActions.js'
 import { connect } from 'react-redux'
 import Loading from 'react-loading'
 import PostsListView from '../components/PostsListView.js'
-import { initialDataLoad, setNavigationError } from '../actions/GenericActions.js'
-import { finishedLoadingData } from '../actions/GenericActions.js'
-import { loadLogicStart, loadLogicProgress } from './LoadLogic.js'
+import { setNavigationError } from '../actions/GenericActions.js'
 
 
 class ListViewContainer extends Component
@@ -18,49 +16,29 @@ class ListViewContainer extends Component
     this.downVote = this.downVote.bind(this)
     this.editPost = this.editPost.bind(this)
     this.validateCategory = this.validateCategory.bind(this)
-    
     this.props.match.params.cat = this.props.match.params.cat ? this.props.match.params.cat : ""
-    
   }
 
     componentDidMount() {
-      	console.log("componentDidMount")
-      	console.log(this.props)
-       loadLogicStart(this.props)
       	this.props.setEditPost(false)
       	this.props.setNewPost(false)
   	}
   
   	componentWillReceiveProps(nextProps){
 
-       loadLogicProgress(this.props, nextProps, this.validateCategory);
+		if (nextProps.isLoaded && nextProps.currentCategory!== nextProps.match.params.cat ? nextProps.match.params.cat : "" ) 
+              nextProps.setCurrentCategory(nextProps.match.params.cat ? nextProps.match.params.cat : "" )
 
-      /*
-     if (!(this.props.isPostsLoaded) && nextProps.isPostsLoaded){
-       console.log("Posts have just loaded therefore I will load comments and set counts.....")
-       	this.props.setPostCommentCounts(nextProps.posts)
-     }
-  
-        
-      if(!(this.props.isAllCommentCountsSet) && nextProps.isAllCommentCountsSet){
-        //just finished setting all comment counts
-        this.props.finishedLoadingData();
-      }
-
-     if (this.props.isLoaded) 
-     	this.props.setCurrentCategory(nextProps.match.params.cat ? nextProps.match.params.cat : "" )
-
-      if(nextProps.categories) {
-          	if (nextProps.match.params.cat)
-              	this.validateCategory(nextProps.match.params.cat)
+		if(nextProps.isLoaded && nextProps.categories) {
+			if (nextProps.match.params.cat){
+				this.validateCategory(nextProps.match.params.cat)
+            }
         }
-        */
     }
   
   
   	validateCategory(cat){
       	//detect if they've navigated here by typing /madeupcategory in the URL
-
       	if ( this.props.categories.length>0 && cat !== "" )
         {
           if ( this.props.categories.filter( (c) => c.name===cat).length===0)
@@ -89,7 +67,7 @@ class ListViewContainer extends Component
 		return (  
       		<div>
 				<div>
-                     {this.props.isLoaded  === false ? 
+                     {!(this.props.isCategoriesLoaded && this.props.isPostsLoaded) ? 
                       		<div style={{width: "20%", height: "20%", margin: "20% 60% 40% 40%", padding: "10px 10px 0px", textAlign: "center"}} >
 	                            <Loading delay={1} type='spinningBubbles' height='40%' width='40%' color='#222' className='loading' /> 
                         	</div>
@@ -115,10 +93,9 @@ function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
   return { 
     	categories: categories.data,
         posts: posts.data,
-    	isLoaded: generic.loaded,
     	currentCategory: categories.currentCategory,
     	isPostsLoaded: posts.isLoaded,
-    	isAllCommentCountsSet: posts.setAllCommentCounts    	
+    	isCategoriesLoaded: categories.isLoaded
   }
 }
 
@@ -126,14 +103,10 @@ function mapDispatchToProps (dispatch) {
   return {
     upVotePost: (post) => dispatch(upVotePostAction(post)),
     downVotePost: (post) => dispatch(downVotePostAction(post)),
-    triggerInitialDataLoad: () => dispatch( initialDataLoad()),
     setNavigationError: () => dispatch(setNavigationError()),
     setCurrentCategory: (currentCategory) => dispatch(setCurrentCategory(currentCategory)),
     setEditPost: (editPost) => dispatch(setEditPost(editPost)),
     setNewPost: (newPost) => dispatch(setNewPost(newPost)),
-    setPostCommentCounts: (posts) => dispatch(setPostCommentCounts(posts)),
-    finishedLoadingData: () => dispatch(finishedLoadingData())
-
   }
 }
 

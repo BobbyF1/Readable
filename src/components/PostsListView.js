@@ -8,7 +8,7 @@ import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import Comment from 'react-icons/lib/md/comment';
 import { Redirect } from 'react-router-dom'
 import moment from 'moment'
-import { deletePost, editPost } from '../actions/PostActions.js'
+import { deletePost } from '../actions/PostActions.js'
 import { connect } from 'react-redux' 
 
 class PostsListView extends Component {

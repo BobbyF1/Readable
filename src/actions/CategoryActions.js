@@ -4,27 +4,22 @@ export const
 	SET_CURRENT_CATEGORY = 'SET_CURRENT_CATEGORY'
 
 export function setCurrentCategory(currentCategory){
-  
-  console.log("setCurrentCategory")
-  
-  return {
-      type: SET_CURRENT_CATEGORY,
-      currentCategory,
+    return {
+		type: SET_CURRENT_CATEGORY,
+		currentCategory,
 	}
 }
 
 export function setCategories ( categories ) {
-  return {
-    type: SET_CATEGORIES,
-    categories,
+    return {
+        type: SET_CATEGORIES,
+        categories,
   }
 }
 
 export function loadCategories() {
-
-    const urlCat = `${process.env.REACT_APP_BACKEND}/categories`;
-
-   return (dispatch) =>
+	const urlCat = `${process.env.REACT_APP_BACKEND}/categories`;
+	return (dispatch) =>
     {      
 		fetch(urlCat, { headers: { 'Authorization': 'whatever-you-want' }, credentials: 'include' } )
       	.then( (res) => { return(res.text()) })

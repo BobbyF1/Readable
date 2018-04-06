@@ -7,8 +7,16 @@ import EditPost from './components/EditPost.js'
 import Error from './components/Error.js'
 import HeaderBar from './components/HeaderBar.js'
 import Test from './components/Test.js'
+import { initialDataLoad } from './actions/GenericActions.js'
 
 class App extends Component {
+
+	componentDidMount() {
+      console.log("APP COMPONENT MOUNTED")
+		if(!(this.props.isPostsLoaded)){
+			this.props.triggerInitialDataLoad();
+        }
+    }
 
   render() {
 
@@ -43,10 +51,20 @@ function mapStateToProps ( {categories, posts, comments, generic}, ownProps) {
   return { 
     	isEditingPost: posts.isEditingPost,
     	selectedCategory: categories.currentCategory,
-    	categories: categories.data
+    	categories: categories.data,
+		isPostsLoaded: posts.isLoaded,
+    	isCategoriesLoaded: categories.isLoaded
   }
 }
+
+function mapDispatchToProps (dispatch) {
+  return {
+    triggerInitialDataLoad: () => dispatch(initialDataLoad()),  
+  }
+}
+
+
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(App)

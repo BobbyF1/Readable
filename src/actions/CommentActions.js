@@ -1,19 +1,19 @@
 import { increasePostCommentCount, decreasePostCommentCount } from './PostActions.js'
 export const
-	ADD_COMMENTS = 'ADD_COMMENTS',
+	ADD_COMMENT = 'ADD_COMMENT',
 	DOWN_VOTE_COMMENT = 'DOWN_VOTE_COMMENT',
 	UP_VOTE_COMMENT = 'UP_VOTE_COMMENT',
 	DELETED_COMMENT = 'DELETED_COMMENT',
 	EDITED_COMMENT = 'EDITED_COMMENT',
-	ADD_COMMENT = 'ADD_COMMENT', 
-	SET_ZERO_COMMENTS = 'SET_ZERO_COMMENTS'
+	SET_POST_COMMENTS = 'SET_POST_COMMENTS'
 
-export function setZeroComments(){
+export function setPostComments(postId, comments){
   	return {
-      	type: SET_ZERO_COMMENTS
+      	type: SET_POST_COMMENTS,
+      	postId,
+      	comments      
     }  
 }
-
 
 export function editedComment(commentId, body) {
 	return {
@@ -24,75 +24,61 @@ export function editedComment(commentId, body) {
 }
 
 export function downVote (commentId) {
-  return {
-    type: DOWN_VOTE_COMMENT,
-    commentId
-  }
-}
-export function upVote (commentId) {
-  return {
-    type: UP_VOTE_COMMENT,
-    commentId
+    return {
+        type: DOWN_VOTE_COMMENT,
+        commentId
   }
 }
 
-export function addComments ( comments ) {  
-  return {
-    type: ADD_COMMENTS,
-    addComments: comments,
-  }
+export function upVote (commentId) {
+    return {
+        type: UP_VOTE_COMMENT,
+        commentId
+  	}
 }
 
 export function addNewComment ( comment ) {  
-  return {
-    type: ADD_COMMENT,
-    comment,
-  }
+    return {
+        type: ADD_COMMENT,
+        comment,
+    }
 }
 
 export function deletedComment ( commentId ) {  
-  return {
-    type: DELETED_COMMENT,
-    commentId
-  }
+    return {
+        type: DELETED_COMMENT,
+        commentId
+    }
 }
 
 export function upVoteComment (comment) {
-  const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${comment.id}`
-  return (dispatch) => {
-  	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'
-                  }, credentials: 'include', 
-                              method: 'post',
-                              body: JSON.stringify({
-                                  option: "upVote"
-                              })
+    const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${comment.id}`
+    return (dispatch) => {
+		fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'}, credentials: 'include', 
+                            method: 'post',
+                            body: JSON.stringify({ option: "upVote" })
 					})
-      	.then( () => { dispatch(upVote(comment.id)) } )
-  		.catch( (err) => (console.log("Error voting for a comment with id [" + comment.id+"] : " +  err)));    
-  }
+			.then( () => { dispatch(upVote(comment.id)) } )
+			.catch( (err) => (console.log("Error voting for a comment with id [" + comment.id+"] : " +  err)));    
+  		}
 }
 
 export function downVoteComment (comment) {
-  const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${comment.id}`
-  return (dispatch) => {
-  	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'
-                  }, credentials: 'include', 
+    const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${comment.id}`
+    return (dispatch) => {
+        fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'}, credentials: 'include', 
                               method: 'post',
-                              body: JSON.stringify({
-                                  option: "downVote"
-                              })
-					})
+                              body: JSON.stringify({ option: "downVote" }) })
       	.then( () => { dispatch(downVote(comment.id)) } )
   		.catch( (err) => (console.log("Error voting for a comment with id [" + comment.id+"] : " +  err)));    
-  }
+    }
 }
 
 export function deleteComment(comment){
-    const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${comment.id}`;  
+	const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${comment.id}`;  
   	return (dispatch, getState) => {
-    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
-                  }, credentials: 'include' , method: 'delete'
-                       })      	
+    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'}, credentials: 'include', 
+                        method: 'delete' })    
    		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
       	.then( data => { dispatch(deletedComment(comment.id) ) } )
       	.then( data => { dispatch(decreasePostCommentCount(comment.parentId) ) } )
@@ -100,30 +86,22 @@ export function deleteComment(comment){
     }
 }
 
-
-
-
 export function saveEditComment(commentId, body){
     const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${commentId}`;  
-   	let commentBody = JSON.stringify({
-   		body: body
- 	})  	
+   	let commentBody = JSON.stringify({ body: body })  	
     return (dispatch, getState) => {
-    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
-                  }, credentials: 'include' , method: 'put' , body: commentBody
-                       })      	
+    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'}, credentials: 'include', 
+                        	method: 'put' , body: commentBody })      	
    		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
       	.then( data => { dispatch(editedComment(commentId, body) ) } )
    		.catch( err => console.log('error', err))
     }   
 }
 
-
 export function createComment(comment){
-	const dateNow = Date.now()
-  	const newId = dateNow.toString()
-    
-    comment = { ...comment, 
+      const dateNow = Date.now()
+      const newId = dateNow.toString()
+    	comment = { ...comment, 
     	id: newId,
   		timestamp: dateNow,
         voteScore: 1,
@@ -143,18 +121,24 @@ export function createComment(comment){
  	})
     const urlPost = `${process.env.REACT_APP_BACKEND}/comments`;  
   	return (dispatch, getState) => {
-    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
-                  }, credentials: 'include' , method: 'post',     		
-     		body: commentBody
-                       })      	
+    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'}, credentials: 'include',
+                    method: 'post',     		
+     				body: commentBody })      	
    		.then( response => response.json())
-   		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
       	.then( data => { dispatch(addNewComment(comment) ) } )
       	.then( data => { dispatch(increasePostCommentCount(comment.parentId) ) } )
    		.catch( err => console.log('error', err))
     }
 }
 
-
-
-
+export function loadCommentsForPost(postId){
+    const urlPost = `${process.env.REACT_APP_BACKEND}/posts/${postId}/comments`
+    return (dispatch, getState) =>
+    {   
+  		fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' }, credentials: 'include' } )
+      		.then( (res) => { return(res.text()) })
+      		.then ( (data) => {  return JSON.parse(data) } )
+      		.then( (data) => { dispatch(setPostComments(postId, data.filter( (p) => !(p.deleted) ))) ; return (data) } )
+      		.catch( (err) => (console.log("Error retrieving posts in loadPosts: "+ err)));
+  	}
+}

@@ -1,11 +1,8 @@
 import React, { Component } from 'react'
-import { Button } from 'reactstrap';
-import FaPlusSquare from 'react-icons/lib/fa/plus-square';
 import FaAngleDoubleLeft from 'react-icons/lib/fa/angle-double-left';
 import { setSortOrder } from '../actions/PostActions.js'
 import Book from 'react-icons/lib/fa/book';
 import PropTypes from 'prop-types'
-import { Route } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux'
 import {

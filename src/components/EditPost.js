@@ -1,31 +1,30 @@
 import React, { Component } from 'react'
 import { Row, Col, Button, Form, FormGroup, Label, Input, Container } from 'reactstrap';
-import FaEdit from 'react-icons/lib/fa/edit';
 import FaTimesCircle from 'react-icons/lib/fa/times-circle';
 import TiTick from 'react-icons/lib/ti/tick'
 import { connect } from 'react-redux'
 import Modal from 'react-responsive-modal'
 import moment from 'moment'
 import { deletePost, createPost, saveEditPost, setEditPost, setNewPost } from '../actions/PostActions.js'
-import { createComment } from  '../actions/CommentActions.js'
+import { loadCommentsForPost, createComment } from  '../actions/CommentActions.js'
 import { Redirect } from 'react-router-dom'
 import CommentsListView from './CommentsListView.js'
 import MdAdd from 'react-icons/lib/md/add'
-import { loadLogicStart, loadLogicProgress } from './LoadLogic.js'
-import { initialDataLoad, setNavigationError } from '../actions/GenericActions.js'
-import { setPostCommentCounts } from '../actions/PostActions.js'
-import { finishedLoadingData } from '../actions/GenericActions.js'
 import { setCurrentCategory } from '../actions/CategoryActions.js'
+import Loading from 'react-loading'
+
 
 
 class EditPost extends Component{
 
-  state = ({
+  state = {
     		post: {},
     		returnToRoot: false, 
     		openNewCommentModal: false,
-    		newComment: { comment: "", author: "" } 
-		})
+    		newComment: { comment: "", author: "" },
+    		startedLoadingComments: false,
+    		isCommentsLoaded: false
+		}
 
   constructor(props){
       super(props)      
@@ -36,13 +35,57 @@ class EditPost extends Component{
 		this.handleNewComment = this.handleNewComment.bind(this)     
     	this.handleNewCommentChange = this.handleNewCommentChange.bind(this)
 		this.titleCase = this.titleCase.bind(this)
+    	this.load = this.load.bind(this)
   }
 
-	componentDidMount(){       
-      	console.log("componentDidMount")
-      	console.log(this.props)
-      loadLogicStart(this.props)
-  }
+	componentDidMount(){
+      	if(this.props.mode==="edit") this.props.setEditPost(true)
+      	this.load(this.props);
+    }
+
+	componentWillReceiveProps(newProps){
+      	this.load(newProps);
+      	if(newProps.commentLoadIdentifier > this.props.commentLoadIdentifier){
+      		this.setState( {isCommentsLoaded: true } ) 
+    	}      
+    }
+
+	load(pr){
+
+      if(pr.isPostsLoaded && pr.isCategoriesLoaded ) {  
+        if(pr.mode==="edit" ){
+          	if(!(this.state.startedLoadingComments)){
+              this.setState( { startedLoadingComments: true }, function(){
+              	const postId = pr.match.params.postId
+              	const editPost = pr.posts.find( function(p) { return ( p.id ===  postId  ) } )
+              	this.setState( { ...this.state, post:  editPost } )
+              	this.props.loadCommentsForPost ( postId ) 					
+              })
+            }
+        }
+        else{
+            const dateNow = Date.now()
+            const newId = dateNow.toString()
+            pr.setNewPost(true)
+            this.setState( { isCommentsLoaded: true, post: { 
+                                      id: newId,
+                                      timestamp: dateNow,
+                                      title: "New Post",
+                                      body: "New Post Body",
+                                      author: "anonymous",
+                                      category: ( pr.currentCategory!=="" ? pr.currentCategory :
+                                          pr.categories.length>0 ? pr.categories[0].name : "" ),
+                                      voteScore: 0,
+                                      commentCount: 0,
+                                      deleted: false
+                                 } 
+                        } )
+        }      
+      }    
+    
+    
+      
+    }
 
   	validateCategory(cat){
       	//detect if they've navigated here by typing /madeupcategory in the URL
@@ -57,45 +100,7 @@ class EditPost extends Component{
         }      
     } 
 
-	componentWillReceiveProps(nextProps){
-      	console.log("------------------------------------------------------- componentWillReceiveProps")
- 		loadLogicProgress(this.props, nextProps, this.validateCategory);
-      
-      if(this.props.isLoaded){
-      if(this.props.mode==="edit"){
-          const postId = this.props.match.params.postId
-          const editPost = this.props.posts.find( function(p) { return ( p.id ===  postId  ) } )
-
-          this.props.setEditPost(true)
-          this.setState( { post:  editPost  } )
-      }
-      else{
-          const dateNow = Date.now()
-          const newId = dateNow.toString()
-          this.props.setNewPost(true)
-          this.setState( { post: { 
-                                    id: newId,
-                                    timestamp: dateNow,
-                                    title: "New Post",
-                                    body: "New Post Body",
-                                    author: "anonymous",
-                                    category: ( this.props.currentCategory!=="" ? this.props.currentCategory :
-                                        this.props.categories.length>0 ? this.props.categories[0].name : "" ),
-                                    voteScore: 0,
-                                    commentCount: 0,
-                                    deleted: false
-                               } 
-                      } )
-      }      
-
-	if(nextProps.mode==="edit"){     
-          const editPost = nextProps.posts.find( function(p) { return ( p.id ===  nextProps.match.params.postId  ) } )
-          this.setState( { post:  editPost  } )      
-        }
-    }
-}
-
- 	titleCase(str) {
+	titleCase(str) {
     return str.toLowerCase().split(' ').map(x=>x[0].toUpperCase()+x.slice(1)).join(' ');
   }
 
@@ -173,6 +178,12 @@ class EditPost extends Component{
       return(
         <div>
         
+                            {!(this.props.isCategoriesLoaded && this.props.isPostsLoaded && this.state.isCommentsLoaded) ? 
+                      		<div style={{width: "20%", height: "20%", margin: "20% 60% 40% 40%", padding: "10px 10px 0px", textAlign: "center"}} >
+	                            <Loading delay={1} type='spinningBubbles' height='40%' width='40%' color='#222' className='loading' /> 
+                        	</div>
+		: 
+        <div>
           <Modal
             open={this.state.openNewCommentModal}
             onClose={this.requestModalClose}
@@ -287,7 +298,8 @@ class EditPost extends Component{
           </Container>
           <CommentsListView comments={this.props.comments.filter( (c) => c.parentId===this.state.post.id && !c.deleted) }/>
 		</div> : null } 
-	</div>
+	</div>}
+        </div>
 	)}  
 }
 
@@ -297,9 +309,9 @@ function mapStateToProps ( {categories, posts, comments, generic} , ownProps) {
     	currentCategory: categories.currentCategory,
     	categories: categories.data,
     	comments: comments.data,
-    	isLoaded: generic.loaded,
     	isPostsLoaded: posts.isLoaded,
-    	isAllCommentCountsSet: posts.setAllCommentCounts    	
+    	isCategoriesLoaded: categories.isLoaded,
+    	commentLoadIdentifier: comments.loadIdentifier
   }
 }
 
@@ -311,11 +323,8 @@ function mapDispatchToProps (dispatch) {
     setNewPost: (newPost) => dispatch(setNewPost(newPost)),
     deletePost: (deadPost) => dispatch(deletePost(deadPost)), 
     createComment: (newComment) => dispatch(createComment(newComment)),
-    triggerInitialDataLoad: () => dispatch( initialDataLoad()),
-   	setPostCommentCounts: (posts) => dispatch(setPostCommentCounts(posts)),
-    finishedLoadingData: () => dispatch(finishedLoadingData()),
     setCurrentCategory: (currentCategory) => dispatch(setCurrentCategory(currentCategory)),
-
+	loadCommentsForPost: (postId) => dispatch(loadCommentsForPost(postId))
   }
 }
 

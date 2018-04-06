@@ -1,14 +1,12 @@
 import React, { Component } from 'react'
-import { Container, Row, Col } from 'reactstrap';
-import { Button, UncontrolledTooltip} from 'reactstrap';
+import {  Button, Row, Col, Form, FormGroup, Label, Input } from 'reactstrap';
+import { saveEditComment, deleteComment, upVoteComment, downVoteComment } from '../actions/CommentActions.js'
+import { connect } from 'react-redux'
+
 import FaThumpbsUp from 'react-icons/lib/fa/thumbs-up';
 import FaThumpbsDown from 'react-icons/lib/fa/thumbs-down';
 import FaEdit from 'react-icons/lib/fa/edit';
 import FaTimesCircle from 'react-icons/lib/fa/times-circle';
-import { saveEditComment, deleteComment, upVoteComment, downVoteComment } from '../actions/CommentActions.js'
-import { connect } from 'react-redux'
-import CommentButton from './CommentButton.js'
-import { Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 import TiTick from 'react-icons/lib/ti/tick'
 
 class CommentsListView extends Component

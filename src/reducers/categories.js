@@ -6,13 +6,15 @@ import {
 function categories (state = {data: [], isLoaded: false, currentCategory: ""}, action) {
 
   switch (action.type) {
+
     case SET_CATEGORIES:      
   	  const { categories } = action
       return {
+        		...state,
         		data: categories,
               	isLoaded: true,
-               	currentCategory: state.currentCategory
              }      
+
     case SET_CURRENT_CATEGORY:
   	  const { currentCategory } = action
       return {
@@ -20,6 +22,7 @@ function categories (state = {data: [], isLoaded: false, currentCategory: ""}, a
               	isLoaded: state.isLoaded,
                	currentCategory: currentCategory
              }      
+
     default :
       return state
   }
