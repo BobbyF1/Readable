@@ -5,8 +5,8 @@ import comments from './comments.js'
 import generic from './generic.js'
 
 export default combineReducers({
-  categories,
-  posts,
-  comments,
-  generic,
+	categories,
+	posts,
+	comments,
+	generic,
 })

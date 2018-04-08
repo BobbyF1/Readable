@@ -8,40 +8,53 @@ import {
 } from '../actions/CommentActions.js'
 
 function comments ( state = { data: [], loadIdentifier: 0 } , action) {
-
-  switch (action.type) {
-      
-    case EDITED_COMMENT:
-      	return {
-          		...state,
-          		data: state.data.map( (comment) =>  {return comment.id === action.commentId ? Object.assign({}, comment, { body: action.body } ) : comment } ) 
+	switch (action.type) {  
+        
+		case EDITED_COMMENT:
+			return {
+				...state,
+          		data: state.data.map( 
+                  (comment) => {return comment.id === action.commentId ? Object.assign({}, comment, { body: action.body } ) : comment } 
+                ) 
         	}      
       
-    case DOWN_VOTE_COMMENT:
-      	return {
+		case DOWN_VOTE_COMMENT:
+      		return {
           		...state,
-          		data: state.data.map( (comment) =>  {return comment.id === action.commentId ? Object.assign({}, comment, { voteScore: comment.voteScore - 1 } ) : comment } ) 
+          		data: state.data.map( 
+                  (comment) => {return comment.id === action.commentId ? Object.assign({}, comment, { voteScore: comment.voteScore - 1 } ) : comment } 
+                ) 
         	}
 
-    case UP_VOTE_COMMENT:
-      	return {
+    	case UP_VOTE_COMMENT:
+      		return {
           		...state,
-          		data: state.data.map( (comment) =>  {return comment.id === action.commentId ? Object.assign({}, comment, { voteScore: comment.voteScore + 1 } ) : comment } ) 
+          		data: state.data.map( 
+                  (comment) =>  {return comment.id === action.commentId ? Object.assign({}, comment, { voteScore: comment.voteScore + 1 } ) : comment } 
+                ) 
         	}
       
-    case SET_POST_COMMENTS:
-      	return { data: action.comments, 
-               	loadIdentifier: state.loadIdentifier + 1}
+		case SET_POST_COMMENTS:
+			return { 
+              	data: action.comments, 
+               	loadIdentifier: state.loadIdentifier + 1
+            }
 
-	case ADD_COMMENT : 
-      	return {...state, data: [ ...state.data, action.comment] }
+		case ADD_COMMENT: 
+      		return {
+              	...state, 
+              	data: [ ...state.data, action.comment] 
+            }
                 
-    case DELETED_COMMENT:
-      	return { ...state, data: state.data.filter( (c) => c.id!==action.commentId ) };
+		case DELETED_COMMENT:
+      		return { 
+              	...state, 
+              	data: state.data.filter( (c) => c.id!==action.commentId ) 
+            }
       
-    default :
-      return state
-  }
+    	default :
+      		return state
+	}
 }
 
 export default comments

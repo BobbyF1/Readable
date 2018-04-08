@@ -9,15 +9,15 @@ import { setNavigationError } from '../actions/GenericActions.js'
 
 class ListViewContainer extends Component
 {
-  constructor(props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    this.upVote = this.upVote.bind(this)
-    this.downVote = this.downVote.bind(this)
-    this.editPost = this.editPost.bind(this)
-    this.validateCategory = this.validateCategory.bind(this)
-    this.props.match.params.cat = this.props.match.params.cat ? this.props.match.params.cat : ""
-  }
+        this.upVote = this.upVote.bind(this)
+      	this.downVote = this.downVote.bind(this)
+        this.editPost = this.editPost.bind(this)
+        this.validateCategory = this.validateCategory.bind(this)
+        this.props.match.params.cat = this.props.match.params.cat ? this.props.match.params.cat : ""
+    }
 
     componentDidMount() {
       	this.props.setEditPost(false)
@@ -25,28 +25,23 @@ class ListViewContainer extends Component
   	}
   
   	componentWillReceiveProps(nextProps){
-
-		if (nextProps.isLoaded && nextProps.currentCategory!== nextProps.match.params.cat ? nextProps.match.params.cat : "" ) 
-              nextProps.setCurrentCategory(nextProps.match.params.cat ? nextProps.match.params.cat : "" )
-
-		if(nextProps.isLoaded && nextProps.categories) {
-			if (nextProps.match.params.cat){
-				this.validateCategory(nextProps.match.params.cat)
-            }
-        }
-    }
+		if (nextProps.categories && nextProps.categories.length>0 && nextProps.currentCategory!== nextProps.match.params.cat ? nextProps.match.params.cat : "" ){
+			if(this.validateCategory(nextProps)){
+                nextProps.setCurrentCategory(nextProps.match.params.cat ? nextProps.match.params.cat : "" )
+			}
+       	}
+    }  
   
-  
-  	validateCategory(cat){
+  	validateCategory(nextProps){
       	//detect if they've navigated here by typing /madeupcategory in the URL
-      	if ( this.props.categories.length>0 && cat !== "" )
-        {
-          if ( this.props.categories.filter( (c) => c.name===cat).length===0)
-            {
-                this.props.setNavigationError()
-                this.props.history.push('/error')	//should do this from the Action....
+      	if ( nextProps.categories.length>0 && nextProps.match.params.cat !== "" ){
+          if ( nextProps.categories.filter( (c) => c.name===nextProps.match.params.cat).length===0){
+                nextProps.setNavigationError()
+                nextProps.history.push('/error')	//should do this from the Action....
+              	return(false)
             }
-        }      
+        }            
+      	return(true);      
     }
   
 	upVote(post){
@@ -60,10 +55,9 @@ class ListViewContainer extends Component
   	editPost(post){
       this.props.editPost(post)
     }
-
+  
     render(){    
       	const selectedCategory = this.props.match.params.cat ? this.props.match.params.cat : ""
-
 		return (  
       		<div>
 				<div>

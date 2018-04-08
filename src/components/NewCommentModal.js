@@ -12,13 +12,13 @@ class NewCommentModal extends Component{
       	this.handleNewCommentOK = this.handleNewCommentOK.bind(this);
       	this.requestModalClose = this.requestModalClose.bind(this);
     }
+
   	state={
       	openNewCommentModal: false,
 		newComment: { comment: "", author: "" },
     }
 
 	componentWillReceiveProps(nextProps){
-      	console.log("componentWillReciveProps")
       	this.setState( { openNewCommentModal: nextProps.open, newComment: nextProps.newComment} )
     }
 
@@ -42,7 +42,7 @@ class NewCommentModal extends Component{
       	this.props.newCommentOK(this.state.newComment)
     }
 
-  render(){
+  	render(){
 		return(
 			<Modal
 				open={this.state.openNewCommentModal}
@@ -77,4 +77,3 @@ class NewCommentModal extends Component{
 }
 
 export default NewCommentModal
-
