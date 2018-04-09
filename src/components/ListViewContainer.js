@@ -11,7 +11,6 @@ class ListViewContainer extends Component
 {
     constructor(props) {
         super(props);
-
         this.upVote = this.upVote.bind(this)
       	this.downVote = this.downVote.bind(this)
         this.editPost = this.editPost.bind(this)

@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import CommentEditMode from './CommentEditMode.js'
 import CommentReadOnlyMode from './CommentReadOnlyMode.js'
 import CommentsNoComments from './CommentsNoComments.js'
+import ConfirmDeleteModal from './ConfirmDeleteModal.js'
 
 
 class CommentsListView extends Component
@@ -17,11 +18,14 @@ class CommentsListView extends Component
 		this.handleEditCommentChange = this.handleEditCommentChange.bind(this)
 		this.handleEditCommentCancel = this.handleEditCommentCancel.bind(this)
 		this.handleEditCommentOK = this.handleEditCommentOK.bind(this)
+      	this.performDeleteComment = this.performDeleteComment.bind(this)
+      	this.deleteCommentCancelled = this.deleteCommentCancelled.bind(this)
       
 		this.state={
 			editingCommentId: null, 
 			originalComment: null, 
-			editComment: null
+			editComment: null,
+          	openConfirmDeleteModal: false
 		}
 	}
 
@@ -36,11 +40,23 @@ class CommentsListView extends Component
   	handleEditComment(comment){
       this.setState( { editingCommentId: comment.id, 
                       	originalComment: comment.body,
-                     	editComment: comment.body} )
+                     	editComment: comment.body,
+                     	openConfirmDeleteCommentModal: false,
+                      	requestToDelete: {}
+                     } )
     }
 
+  	performDeleteComment(){
+      this.props.deleteComment(this.state.requestToDelete)
+      this.setState({ openConfirmDeleteModal: false, requestToDelete: {} }) 
+    }
+  
+  	deleteCommentCancelled(){
+      this.setState({ openConfirmDeleteModal: false, requestToDelete: {} })       
+    }
+  
   	handleDeleteComment(comment){
-      this.props.deleteComment(comment)
+      this.setState({ openConfirmDeleteModal: true, requestToDelete: comment }) 
     }
   
   	handleEditCommentChange(e){
@@ -48,7 +64,6 @@ class CommentsListView extends Component
     }
   
   	handleEditCommentOK(){
-		///save the edited comment
       	this.props.saveEditComment ( this.state.editingCommentId, this.state.editComment ); 
       	this.setState( {editingCommentId: null, originalComment: null, editComment: null } )
     }
@@ -58,9 +73,17 @@ class CommentsListView extends Component
     }
  
 	render(){
+      
 		return(
-		<div>
-			{this.props.comments.map( (c) =>
+		<div>          
+			<ConfirmDeleteModal 
+          			openConfirmDeleteModal={this.state.openConfirmDeleteModal} 
+          			deleteObject={this.state.requestToDelete}
+          			deleteObjectName={"comment"} 
+          			deleteConfirmed={this.performDeleteComment} 
+          			deleteCancelled={this.deleteCommentCancelled} />   	
+          
+			{this.props.comments.sort(function(a,b){return b.voteScore-a.voteScore}).map( (c) =>
 				<div key={"edit"+c.id} className="border" style={{width: "60%", margin: "10px 20px 2% 20%", padding: "10px 10px 0px"}} >
 					{ this.state.editingCommentId && this.state.editingCommentId===c.id ?
           				<CommentEditMode 	editComment={this.state.editComment} 

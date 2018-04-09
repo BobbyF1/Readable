@@ -26,9 +26,7 @@ function posts (state = {
 			return {
 				...state,
           		data: action.posts,
-          		isLoaded: true, 
-          		isEditingPost: false,
-          		isNewPost: false          
+          		isLoaded: true     
 			}
       
 		case UP_VOTE_POST:
@@ -47,7 +45,7 @@ function posts (state = {
                 )
         	}
       
-		case SET_EDIT_POST:      
+		case SET_EDIT_POST:
 			return {
               	...state, 
               	isEditingPost: action.edit

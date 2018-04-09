@@ -175,8 +175,7 @@ export function saveEditPost(post){
     	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
                   }, credentials: 'include' , method: 'put' , body: postBody
                        })      	
-   		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
-      	.then( data => { dispatch(editedPost(post.id) ) } )
+      	.then( data => { dispatch(editedPost(post) ) } )
    		.catch( err => console.log('error', err))
     }   
 }

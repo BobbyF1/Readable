@@ -6,6 +6,7 @@ import { Redirect } from 'react-router-dom'
 import moment from 'moment'
 import { deletePost } from '../actions/PostActions.js'
 import { connect } from 'react-redux' 
+import ConfirmDeleteModal from './ConfirmDeleteModal.js'
 
 import FaThumpbsUp from 'react-icons/lib/fa/thumbs-up';
 import FaThumpbsDown from 'react-icons/lib/fa/thumbs-down';
@@ -16,10 +17,14 @@ class PostsListView extends Component {
 	constructor(props) {
 		super(props);
 		this.dynamicSort = this.dynamicSort.bind(this)
-	}
+  		this.performDeletePost = this.performDeletePost.bind(this)
+    	this.deletePostCancelled = this.deletePostCancelled.bind(this)
+  		this.handleDeletePost = this.handleDeletePost.bind(this)
+    }
   
 	state={
-		navigateToPost : null 
+		navigateToPost : null ,
+      	openConfirmDeleteModal: false
     }
   
     static propTypes = {
@@ -55,6 +60,21 @@ class PostsListView extends Component {
         }
 	}
 
+  	performDeletePost(){
+      this.props.deletePost(this.state.requestToDelete)
+      this.setState( { returnToRoot: true } );
+      this.setState({ openConfirmDeleteModal: false, requestToDelete: {} }) 
+    }
+  
+  	deletePostCancelled(){
+      this.setState({ openConfirmDeleteModal: false, requestToDelete: {} })       
+    }
+  
+  	handleDeletePost(post){
+      this.setState({ openConfirmDeleteModal: true, requestToDelete: post }) 
+    }
+
+
 	render(){     
 		const { posts } = this.props
       	if (this.state.navigateToPost) {
@@ -65,14 +85,21 @@ class PostsListView extends Component {
       	}
       
       return (
-		<ul className="list-group">
+        <div>
+        	<ConfirmDeleteModal 
+        				openConfirmDeleteModal={this.state.openConfirmDeleteModal} 
+        				deleteObject={this.state.requestToDelete}
+        				deleteObjectName={"post"} 
+        				deleteConfirmed={this.performDeletePost} 
+        				deleteCancelled={this.deletePostCancelled} />  
+        <ul className="list-group">
 			{posts.sort(this.dynamicSort(this.props.postSortOrder)).map( (post) => 
 			<div key={post.id} className="border" style={{width: "60%", margin: "20px 20px 2px 20%", padding: "20px 20px 10px"}} >
 				<div style={{"marginLeft": "20px", "marginRight": "20px"}}>
                     <strong>{post.title}</strong>
                     <p><strong><em>{post.author}</em></strong><small> | Category: <em>{post.category} </em><strong>| </strong> <Comment /> 
 						<em>{post.commentCount ? post.commentCount : 0 }</em>   
-							{ post.voteScore >= 0 ? <FaThumpbsUp color={"green"}/> : <FaThumpbsDown  color={"red"}/> }{post.voteScore}
+							{"    "}{ post.voteScore >= 0 ? <FaThumpbsUp color={"green"}/> : <FaThumpbsDown  color={"red"}/> }{post.voteScore}
                             {" |"} Created: <em>{moment(post.timestamp).format('MMMM Do YYYY, h:mm:ss a') }</em></small>
 					</p>
 				</div>
@@ -84,12 +111,13 @@ class PostsListView extends Component {
                     <Button className="btn btn-primary float-right" style={{margin: "0px 10px"}} size="sm" color="primary" 
 							onClick={ (e) => this.setState( { navigateToPost: post } ) }><FaEdit /> Edit Post</Button>{' '}
                     <Button className="btn btn-secondary float-right" style={{margin: "0px 10px"}} size="sm" color="secondary"
-							onClick={ (e) => this.props.deletePost(post) } ><FaTimesCircle /> Delete Post</Button>{' '}
+							onClick={ (e) => this.handleDeletePost(post) } ><FaTimesCircle /> Delete Post</Button>{' '}
 				</div>  		
         	</div>
       		)
     	}     
       	</ul>
+		</div>
       )
     }
 }

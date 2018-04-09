@@ -13,15 +13,19 @@ import { setCurrentCategory } from '../actions/CategoryActions.js'
 import Loading from 'react-loading'
 import NewCommentModal from './NewCommentModal.js'
 import { setNavigationError } from '../actions/GenericActions.js'
+import ValidationFailureModal from './ValidationFailureModal.js'
+import ConfirmDeleteModal from './ConfirmDeleteModal.js'
 
 class EditPost extends Component{
     state = {
     		post: {},
     		returnToRoot: false, 
     		openNewCommentModal: false,
-    		newComment: { comment: "", author: "" },
-    		startedLoadingComments: false,
-    		isCommentsLoaded: false
+      		openValidationErrorModal: false,
+      		validationErrorMessage: "",
+    		newComment: { comment: "", author: "" },    		
+    		isCommentsLoaded: false,
+      		openConfirmDeleteModal: false
 		}
 
   constructor(props){
@@ -29,13 +33,17 @@ class EditPost extends Component{
 		this.handleChange = this.handleChange.bind(this)
 		this.handleOK = this.handleOK.bind(this)
 		this.requestModalClose = this.requestModalClose.bind(this)
-		this.handleDelete = this.handleDelete.bind(this)
 		this.handleNewComment = this.handleNewComment.bind(this)     
     	this.handleNewCommentChange = this.handleNewCommentChange.bind(this)
     	this.handleNewCommentOK = this.handleNewCommentOK.bind(this)
 		this.titleCase = this.titleCase.bind(this)
     	this.load = this.load.bind(this)
-  }
+    	this.handleClosedValidationModal = this.handleClosedValidationModal.bind(this)
+  		this.performDeletePost = this.performDeletePost.bind(this)
+    	this.deletePostCancelled = this.deletePostCancelled.bind(this)
+  		this.handleDeletePost = this.handleDeletePost.bind(this)
+  	}
+    
 
 	componentDidMount(){
       	if(this.props.mode==="edit"){
@@ -56,19 +64,19 @@ class EditPost extends Component{
             if(pr.mode==="edit" ){
                 if(!(this.state.startedLoadingComments)){
                     this.setState( { startedLoadingComments: true }, function(){
-                        const postId = pr.match.params.postId
-                        const editPost = pr.posts.find( function(p) { return ( p.id ===  postId  ) } )
-                        if(editPost===undefined){
-                          	//error
-                            pr.setNavigationError()
-                            pr.history.push('/error')	//should do this from the Action....
-                        }else{                          
-                          this.setState( { ...this.state, post:  editPost } )
-                          this.props.loadCommentsForPost ( postId ) 					
-                        }
-                    })
-                }
-            }
+                          this.props.loadCommentsForPost ( pr.match.params.postId ) 					
+                        })
+                	}
+
+                    const editPost = pr.posts.find( function(p) { return ( p.id === pr.match.params.postId  ) } )
+                    if(editPost===undefined){
+                        //error
+                        pr.setNavigationError()
+                        pr.history.push('/error')
+                    }else{                          
+                        this.setState( { ...this.state, post: {...editPost} } )
+					}
+	            }
             else{
                 //New Post mode
                 const dateNow = Date.now()
@@ -110,10 +118,14 @@ class EditPost extends Component{
         this.setState( { openNewCommentModal: false} )      
     }
 
+	handleClosedValidationModal(){
+		this.setState( { validationErrorMessage: "", openValidationErrorModal: false} )
+    }
+
 	handleOK(){
 		if(this.state.post.title === "" || this.state.post.body === "" || this.state.post.category === "" || this.state.post.author === ""){
-			this.setState( { validationErrorMessage: "A post must have a Category, Title, Body and Author."} )
-		}
+			this.setState( { validationErrorMessage: "A post must have a Category, Title, Body and Author.", openValidationErrorModal: true} )
+        }
 		else{
 			if(this.props.mode==="edit"){
 				this.props.saveEditPost(this.state.post)
@@ -133,9 +145,18 @@ class EditPost extends Component{
                         } )
     }
 
-	handleDelete(){
-      	this.props.deletePost(this.state.post)
-      	this.setState( { returnToRoot: true} );
+  	performDeletePost(){
+      this.props.deletePost(this.state.post)
+      this.setState( { returnToRoot: true } );
+      this.setState({ openConfirmDeleteModal: false, requestToDelete: {} }) 
+    }
+  
+  	deletePostCancelled(){
+      this.setState({ openConfirmDeleteModal: false, requestToDelete: {} })       
+    }
+  
+  	handleDeletePost(post){
+      this.setState({ openConfirmDeleteModal: true, requestToDelete: post }) 
     }
 
     handleChange(e) {
@@ -157,30 +178,39 @@ class EditPost extends Component{
           	author: nc.author
         }      
       	this.props.createComment(newComment)
-      	this.setState( { openNewCommentModal: false } )      
+      	this.setState( { openNewCommentModal: false } )
 	}
 
 	render(){      
       	if (this.state.returnToRoot) {
             if (window.location.pathname !== "/") {
-                return <Redirect to = { "/" } push={true} /> 		
+                return <Redirect to = { "/"+this.props.currentCategory } push={true} /> 		
             }
         } 
           
 	    return(
-		    <div> 
+		    <div>
 			    {!(this.props.isCategoriesLoaded && this.props.isPostsLoaded && this.state.isCommentsLoaded) ? 
 				    <div style={{width: "20%", height: "20%", margin: "20% 60% 40% 40%", padding: "10px 10px 0px", textAlign: "center"}} >
 					    <Loading delay={1} type='spinningBubbles' height='40%' width='40%' color='#222' className='loading' /> 
 				    </div>
 			    : 
 				<div>
+          			<ValidationFailureModal open={this.state.openValidationErrorModal} validationMessage={this.state.validationErrorMessage}
+          						handleClosedValidationModal={this.handleClosedValidationModal}/>
+          
       				<NewCommentModal open={this.state.openNewCommentModal} 
       								newComment={this.state.newComment}
       								newCommentChange={this.handleNewCommentChange}
       								newCommentOK={this.handleNewCommentOK}
       								newCommentCancel={this.handleNewCommentCancel} />
-        
+
+          			<ConfirmDeleteModal 
+                      				openConfirmDeleteModal={this.state.openConfirmDeleteModal} 
+                      				deleteObject={this.state.requestToDelete}
+                      				deleteObjectName={"post"} 
+                      				deleteConfirmed={this.performDeletePost} 
+                      				deleteCancelled={this.deletePostCancelled} />  
         
                     <div className="border" style={{width: "60%", margin: "10px 20px 2% 20%", padding: "10px 10px 0px"}} >
                     <h1>{this.titleCase(this.props.mode.toUpperCase() + ' Post')}</h1>
@@ -240,7 +270,7 @@ class EditPost extends Component{
                                     <Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="primary" 
 												onClick={ (e) => this.handleOK() }><TiTick/> Save </Button> 
                                     <Button className="btn float-right" style={{margin: "0px 10px", width: "100px"}} size="sm" color="secondary" 
-												onClick={ (e) => this.handleDelete() }><FaTimesCircle/> Delete </Button> 
+												onClick={ (e) => this.handleDeletePost() }><FaTimesCircle/> Delete </Button> 
                                 </Col>
                             : null }
                             {this.props.mode==="create" ?

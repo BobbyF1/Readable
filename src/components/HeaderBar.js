@@ -40,6 +40,11 @@ class HeaderBar extends Component
     	categoryFilter: PropTypes.string.isRequired,
     	categories: PropTypes.array.isRequired,
   	}
+
+	componentWillReceiveProps(nextProps){
+     	console.log("Will")
+      	console.log(nextProps)
+    }
   
 	handleNewPost(){
 		this.props.newPost()
