@@ -12,7 +12,6 @@ import MdAdd from 'react-icons/lib/md/add'
 import { setCurrentCategory } from '../actions/CategoryActions.js'
 import Loading from 'react-loading'
 import NewCommentModal from './NewCommentModal.js'
-import { setNavigationError } from '../actions/GenericActions.js'
 import ValidationFailureModal from './ValidationFailureModal.js'
 import ConfirmDeleteModal from './ConfirmDeleteModal.js'
 
@@ -71,7 +70,6 @@ class EditPost extends Component{
                     const editPost = pr.posts.find( function(p) { return ( p.id === pr.match.params.postId  ) } )
                     if(editPost===undefined){
                         //error
-                        pr.setNavigationError()
                         pr.history.push('/error')
                     }else{                          
                         this.setState( { ...this.state, post: {...editPost} } )
@@ -324,7 +322,6 @@ function mapDispatchToProps (dispatch) {
         createComment: (newComment) => dispatch(createComment(newComment)),
         setCurrentCategory: (currentCategory) => dispatch(setCurrentCategory(currentCategory)),
         loadCommentsForPost: (postId) => dispatch(loadCommentsForPost(postId)),
-    	setNavigationError: () => dispatch(setNavigationError())
     }
 }
 

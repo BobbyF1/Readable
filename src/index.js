@@ -24,7 +24,7 @@ const logger = store => next => action => {
 
 const store = createStore(
   combinedReducers,	//categories
-  composeEnhancers(applyMiddleware(thunk,logger))
+  composeEnhancers(applyMiddleware(thunk, logger))
 )
 
 ReactDOM.render(

@@ -4,8 +4,6 @@ import { setCurrentCategory } from '../actions/CategoryActions.js'
 import { connect } from 'react-redux'
 import Loading from 'react-loading'
 import PostsListView from '../components/PostsListView.js'
-import { setNavigationError } from '../actions/GenericActions.js'
-
 
 class ListViewContainer extends Component
 {
@@ -96,7 +94,6 @@ function mapDispatchToProps (dispatch) {
   return {
     upVotePost: (post) => dispatch(upVotePostAction(post)),
     downVotePost: (post) => dispatch(downVotePostAction(post)),
-    setNavigationError: () => dispatch(setNavigationError()),
     setCurrentCategory: (currentCategory) => dispatch(setCurrentCategory(currentCategory)),
     setEditPost: (editPost) => dispatch(setEditPost(editPost)),
     setNewPost: (newPost) => dispatch(setNewPost(newPost)),
