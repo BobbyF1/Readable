@@ -74,7 +74,6 @@ class PostsListView extends Component {
       this.setState({ openConfirmDeleteModal: true, requestToDelete: post }) 
     }
 
-
 	render(){     
 		const { posts } = this.props
       	if (this.state.navigateToPost) {

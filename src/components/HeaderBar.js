@@ -41,11 +41,6 @@ class HeaderBar extends Component
     	categories: PropTypes.array.isRequired,
   	}
 
-	componentWillReceiveProps(nextProps){
-     	console.log("Will")
-      	console.log(nextProps)
-    }
-  
 	handleNewPost(){
 		this.props.newPost()
 	}
@@ -60,7 +55,7 @@ class HeaderBar extends Component
                         <NavbarToggler onClick={this.toggle} />
                         <Collapse isOpen={this.state.isOpen} navbar>
                           <Nav className="ml-auto" navbar>
-                            <NavItem>
+                            <NavItem componentClass="span">
                                 <Link to="/posts/create"><NavLink>New Post</NavLink></Link>
                             </NavItem>
                             <UncontrolledDropdown nav inNavbar>

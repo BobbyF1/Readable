@@ -157,7 +157,6 @@ export function deletePost(post){
     	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
                   }, credentials: 'include' , method: 'delete'
                        })      	
-   		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
       	.then( data => { dispatch(deletedPost(post.id) ) } )
    		.catch( err => console.log('error', err))
     }
