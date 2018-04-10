@@ -26,3 +26,7 @@ to start the front end server. (The API server will of course have to be running
    
 3. I've left a logger running to display messages in the Console.
 
+4. The version of the API used is the most recent version available on GitHub. It is NOT the version that was supplied when I created
+   the initial workspace, which did not have the commentCount returned for a post. 
+   
+   
