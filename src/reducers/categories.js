@@ -1,7 +1,7 @@
 import {
     SET_CATEGORIES,
     SET_CURRENT_CATEGORY
-} from '../actions/CategoryActions.js'
+} from '../actions/Types.js'
 
 function categories (state = {data: [], isLoaded: false, currentCategory: ""}, action) {
     switch (action.type) {

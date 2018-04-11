@@ -1,6 +1,6 @@
 import {
   NAVIGATION_ERROR
-} from '../actions/GenericActions.js'
+} from '../actions/Types.js'
 
 function generic (state = { loaded: false }, action) {
 	switch (action.type) {

@@ -5,7 +5,7 @@ import {
   	DELETED_COMMENT,
   	EDITED_COMMENT, 
 	ADD_COMMENT, 
-} from '../actions/CommentActions.js'
+} from '../actions/Types.js'
 
 function comments ( state = { data: [], loadIdentifier: 0 } , action) {
 	switch (action.type) {  

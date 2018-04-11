@@ -10,7 +10,7 @@ import {
 	SET_SORT_ORDER,
 	DECREASE_POST_COMMENT_COUNT, 
 	INCREASE_POST_COMMENT_COUNT 
-} from '../actions/PostActions.js'
+} from '../actions/Types.js'
 
 function posts (state = {
   						 data: [], 

@@ -1,9 +1,6 @@
 import { loadCategories } from '../actions/CategoryActions.js'
 import { loadPosts } from '../actions/PostActions.js'
-
-export const
-	LOADING_DATA = 'SET_LOADING_DATA',
-	NAVIGATION_ERROR = 'NAVIGATION_ERROR'
+import { NAVIGATION_ERROR } from '../actions/Types.js'
 
 export function setNavigationError(){
   	return(dispatch) => {

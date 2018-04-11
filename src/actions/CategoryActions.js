@@ -1,7 +1,6 @@
-export const
-	SET_CATEGORIES = 'SET_CATEGORIES',
-	LOAD_CATEGORIES = 'LOAD_CATEGORIES',
-	SET_CURRENT_CATEGORY = 'SET_CURRENT_CATEGORY'
+import
+{ SET_CATEGORIES ,
+	SET_CURRENT_CATEGORY } from './Types.js'
 
 export function setCurrentCategory(currentCategory){
     return {

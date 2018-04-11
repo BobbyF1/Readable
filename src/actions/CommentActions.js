@@ -1,11 +1,12 @@
 import { increasePostCommentCount, decreasePostCommentCount } from './PostActions.js'
-export const
-	ADD_COMMENT = 'ADD_COMMENT',
-	DOWN_VOTE_COMMENT = 'DOWN_VOTE_COMMENT',
-	UP_VOTE_COMMENT = 'UP_VOTE_COMMENT',
-	DELETED_COMMENT = 'DELETED_COMMENT',
-	EDITED_COMMENT = 'EDITED_COMMENT',
-	SET_POST_COMMENTS = 'SET_POST_COMMENTS'
+import {
+	ADD_COMMENT ,
+	DOWN_VOTE_COMMENT ,
+	UP_VOTE_COMMENT ,
+	DELETED_COMMENT ,
+	EDITED_COMMENT ,
+	SET_POST_COMMENTS 
+} from '../actions/Types.js'
 
 export function setPostComments(postId, comments){
   	return {
