@@ -11,6 +11,8 @@ import {
 	DECREASE_POST_COMMENT_COUNT , 
 	INCREASE_POST_COMMENT_COUNT
 } from '../actions/Types.js'
+import { url, credentials } from '../APICall.js'
+
 
 export function decreasePostCommentCount(postId){
   return{
@@ -89,10 +91,10 @@ export function setPosts ( posts ) {
 }
 
 export function downVotePostAction(postId){ 
-  const urlPost = `${process.env.REACT_APP_BACKEND}/posts/${postId}`
+  const urlPost = `${url}/posts/${postId}`
   return (dispatch) => {
   	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'
-                  }, credentials: 'include', 
+                  }, credentials: credentials, 
                               method: 'post',
                               body: JSON.stringify({
                                   option: "downVote"
@@ -104,10 +106,10 @@ export function downVotePostAction(postId){
 }
 
 export function upVotePostAction(postId){ 
-  const urlPost = `${process.env.REACT_APP_BACKEND}/posts/${postId}`
+  const urlPost = `${url}/posts/${postId}`
   return (dispatch) => {
   	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'
-                  }, credentials: 'include', 
+                  }, credentials: credentials, 
                               method: 'post',
                               body: JSON.stringify({
                                   option: "upVote"
@@ -119,10 +121,10 @@ export function upVotePostAction(postId){
 }
 
 export function loadPosts() {
-  const urlPost = `${process.env.REACT_APP_BACKEND}/posts`;
+  const urlPost = `${url}/posts`;
   return (dispatch, getState) =>
   {  
-  	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' }, credentials: 'include' } )
+  	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' }, credentials: credentials } )
       .then( (res) => { return(res.text()) })
       .then ( (data) => {  return JSON.parse(data) } )
       .then( (data) => { dispatch(setPosts(data.filter( (p) => !(p.deleted) ))) ; return (data) } )
@@ -139,10 +141,10 @@ export function createPost(post){
    		author: post.author,
    		category: post.category
  	})
-    const urlPost = `${process.env.REACT_APP_BACKEND}/posts`;  
+    const urlPost = `${url}/posts`;  
   	return (dispatch, getState) => {
     	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
-                  }, credentials: 'include' , method: 'post',     		
+                  }, credentials: credentials , method: 'post',     		
      		body: postBody
                        })      	
    		.then( response => response.json())
@@ -152,10 +154,10 @@ export function createPost(post){
 }
 
 export function deletePost(post){
-    const urlPost = `${process.env.REACT_APP_BACKEND}/posts/${post.id}`;  
+    const urlPost = `${url}/posts/${post.id}`;  
   	return (dispatch, getState) => {
     	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
-                  }, credentials: 'include' , method: 'delete'
+                  }, credentials: credentials , method: 'delete'
                        })      	
       	.then( data => { dispatch(deletedPost(post.id) ) } )
    		.catch( err => console.log('error', err))
@@ -163,7 +165,7 @@ export function deletePost(post){
 }
 
 export function saveEditPost(post){
-    const urlPost = `${process.env.REACT_APP_BACKEND}/posts/${post.id}`;  
+    const urlPost = `${url}/posts/${post.id}`;  
    	let postBody = JSON.stringify({
    		title: post.title,
    		body: post.body,
@@ -172,7 +174,7 @@ export function saveEditPost(post){
  	})  	
     return (dispatch, getState) => {
     	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'
-                  }, credentials: 'include' , method: 'put' , body: postBody
+                  }, credentials: credentials , method: 'put' , body: postBody
                        })      	
       	.then( data => { dispatch(editedPost(post) ) } )
    		.catch( err => console.log('error', err))

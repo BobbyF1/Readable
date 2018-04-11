@@ -7,6 +7,7 @@ import {
 	EDITED_COMMENT ,
 	SET_POST_COMMENTS 
 } from '../actions/Types.js'
+import { url, credentials } from '../APICall.js'
 
 export function setPostComments(postId, comments){
   	return {
@@ -53,9 +54,9 @@ export function deletedComment ( commentId ) {
 }
 
 export function upVoteComment (comment) {
-    const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${comment.id}`
+    const urlPost = `${url}/comments/${comment.id}`
     return (dispatch) => {
-		fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'}, credentials: 'include', 
+		fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'}, credentials: credentials, 
                             method: 'post',
                             body: JSON.stringify({ option: "upVote" })
 					})
@@ -65,9 +66,9 @@ export function upVoteComment (comment) {
 }
 
 export function downVoteComment (comment) {
-    const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${comment.id}`
+    const urlPost = `${url}/comments/${comment.id}`
     return (dispatch) => {
-        fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'}, credentials: 'include', 
+        fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want', 'Content-Type': 'application/json'}, credentials: credentials, 
                               method: 'post',
                               body: JSON.stringify({ option: "downVote" }) })
       	.then( () => { dispatch(downVote(comment.id)) } )
@@ -76,9 +77,9 @@ export function downVoteComment (comment) {
 }
 
 export function deleteComment(comment){
-	const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${comment.id}`;  
+	const urlPost = `${url}/comments/${comment.id}`;  
   	return (dispatch, getState) => {
-    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'}, credentials: 'include', 
+    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'}, credentials: credentials, 
                         method: 'delete' })    
    		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
       	.then( data => { dispatch(deletedComment(comment.id) ) } )
@@ -88,10 +89,10 @@ export function deleteComment(comment){
 }
 
 export function saveEditComment(commentId, body){
-    const urlPost = `${process.env.REACT_APP_BACKEND}/comments/${commentId}`;  
+    const urlPost = `${url}/comments/${commentId}`;  
    	let commentBody = JSON.stringify({ body: body })  	
     return (dispatch, getState) => {
-    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'}, credentials: 'include', 
+    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'}, credentials: credentials, 
                         	method: 'put' , body: commentBody })      	
    		.then( data => { console.log('DATA RETURNED IS ', data); return (data) } )
       	.then( data => { dispatch(editedComment(commentId, body) ) } )
@@ -120,9 +121,9 @@ export function createComment(comment){
       	deleted: comment.deleted,
       	parentDelete: comment.parentDelete
  	})
-    const urlPost = `${process.env.REACT_APP_BACKEND}/comments`;  
+    const urlPost = `${url}/comments`;  
   	return (dispatch, getState) => {
-    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'}, credentials: 'include',
+    	fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' , 'Content-Type': 'application/json'}, credentials: credentials,
                     method: 'post',     		
      				body: commentBody })      	
    		.then( response => response.json())
@@ -133,10 +134,10 @@ export function createComment(comment){
 }
 
 export function loadCommentsForPost(postId){
-    const urlPost = `${process.env.REACT_APP_BACKEND}/posts/${postId}/comments`
+    const urlPost = `${url}/posts/${postId}/comments`
     return (dispatch, getState) =>
     {   
-  		fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' }, credentials: 'include' } )
+  		fetch(urlPost, { headers: { 'Authorization': 'whatever-you-want' }, credentials: credentials } )
       		.then( (res) => { return(res.text()) })
       		.then ( (data) => {  return JSON.parse(data) } )
       		.then( (data) => { dispatch(setPostComments(postId, data.filter( (p) => !(p.deleted) ))) ; return (data) } )
