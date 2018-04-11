@@ -1,5 +1,5 @@
 import
-{ SET_CATEGORIES ,
+{ 	SET_CATEGORIES ,
 	SET_CURRENT_CATEGORY } from './Types.js'
 
 export function setCurrentCategory(currentCategory){
@@ -16,8 +16,11 @@ export function setCategories ( categories ) {
   }
 }
 
+const url =  `${process.env.REACT_APP_BACKEND}` ||  'http://localhost:3001';
+
 export function loadCategories() {
-	const urlCat = `${process.env.REACT_APP_BACKEND}/categories`;
+	const urlCat = `${url}/categories`;
+  	console.log(urlCat)
 	return (dispatch) =>
     {      
 		fetch(urlCat, { headers: { 'Authorization': 'whatever-you-want' }, credentials: 'include' } )
